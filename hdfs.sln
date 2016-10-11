@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{94D665CA-D915-4DE1-AA53-913450A1AE2D}") = "hdfslib", "..\hdfslib\hdfslib.fsharpp", "{9F94936C-903B-426C-A2B3-B2624360B78B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B72AA570-3B2E-4D41-9C63-5BEAF45E1463} = {B72AA570-3B2E-4D41-9C63-5BEAF45E1463}
-	EndProjectSection
-EndProject
 Project("{94D665CA-D915-4DE1-AA53-913450A1AE2D}") = "hdfsxilinx", "..\hdfsxilinx\hdfsxilinx.fsharpp", "{0C7C5B80-DD0D-4D8F-B588-725A255C7A71}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9F94936C-903B-426C-A2B3-B2624360B78B} = {9F94936C-903B-426C-A2B3-B2624360B78B}
@@ -15,6 +10,8 @@ Project("{94D665CA-D915-4DE1-AA53-913450A1AE2D}") = "hdfsxilinx", "..\hdfsxilinx
 	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "hdfs", "hdfs\hdfs.fsproj", "{89CBB24E-1AE4-4B71-821A-A15998EEC074}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "hdfslib", "hdfslib\hdfslib.fsproj", "{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,11 +21,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F94936C-903B-426C-A2B3-B2624360B78B}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{9F94936C-903B-426C-A2B3-B2624360B78B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9F94936C-903B-426C-A2B3-B2624360B78B}.Debug|Win32.Build.0 = Debug|Win32
-		{9F94936C-903B-426C-A2B3-B2624360B78B}.Release|Any CPU.ActiveCfg = Release|Win32
-		{9F94936C-903B-426C-A2B3-B2624360B78B}.Release|Win32.ActiveCfg = Release|Win32
 		{0C7C5B80-DD0D-4D8F-B588-725A255C7A71}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{0C7C5B80-DD0D-4D8F-B588-725A255C7A71}.Debug|Win32.ActiveCfg = Debug|Win32
 		{0C7C5B80-DD0D-4D8F-B588-725A255C7A71}.Debug|Win32.Build.0 = Debug|Win32
@@ -42,6 +34,14 @@ Global
 		{89CBB24E-1AE4-4B71-821A-A15998EEC074}.Release|Any CPU.Build.0 = Release|Any CPU
 		{89CBB24E-1AE4-4B71-821A-A15998EEC074}.Release|Win32.ActiveCfg = Release|Any CPU
 		{89CBB24E-1AE4-4B71-821A-A15998EEC074}.Release|Win32.Build.0 = Release|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Debug|Win32.Build.0 = Debug|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Release|Win32.ActiveCfg = Release|Any CPU
+		{870D808B-8E6B-4B04-9BEA-C88E45EB8D7F}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
