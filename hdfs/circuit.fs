@@ -1,3 +1,4 @@
+#light "off"
 (*
   HDFS Digital Logic Hardware Design (HDFS.dll)
   Copyright (C) 2006 Andy Ray.
