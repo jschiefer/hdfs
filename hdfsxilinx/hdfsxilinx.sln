@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hdfsxilinx", "hdfsxilinx.vcproj", "{AF8D207A-D721-47FD-86C3-6CEAE9B13F4B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hdfscosim", "..\hdfscosim\hdfscosim.vcproj", "{2238D754-5245-480D-89B4-745B12228835}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF8D207A-D721-47FD-86C3-6CEAE9B13F4B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AF8D207A-D721-47FD-86C3-6CEAE9B13F4B}.Debug|Win32.Build.0 = Debug|Win32
+		{AF8D207A-D721-47FD-86C3-6CEAE9B13F4B}.Release|Win32.ActiveCfg = Release|Win32
+		{AF8D207A-D721-47FD-86C3-6CEAE9B13F4B}.Release|Win32.Build.0 = Release|Win32
+		{2238D754-5245-480D-89B4-745B12228835}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2238D754-5245-480D-89B4-745B12228835}.Debug|Win32.Build.0 = Debug|Win32
+		{2238D754-5245-480D-89B4-745B12228835}.Release|Win32.ActiveCfg = Release|Win32
+		{2238D754-5245-480D-89B4-745B12228835}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
