@@ -1,0 +1,116 @@
+=Adder (and simulation)=
+
+A simple N-bit adder can be built using multiple one bit full adders in which the carry propagates from the least significant bit up to the most significant bit. This is often called a carry ripple, or carry propagate adder. Although it is not necessarily the most efficient implementation possible it is an ideal example with which to show recursive hardware generation.
+
+In the utility library (hdfslib.dll) is a module which contains a few adder primitives. For our purposes we will use the `fa` function (full adder) to build our complete adder module.
+
+{{{
+let fa x y z = 
+  let s = (x ^: y) ^: z in
+  let c = (x &: y) |: (x &: z) |: (y &: z) in
+  c, s
+}}}
+
+Given x, y (the two input bits) and z (the carry in bit) it generates the sum and carry out bits using `and`, `xor` and `or` gates.
+
+Now we need to define a function to generate the complete adder module:
+
+{{{
+let adder x y = 
+    let rec adder' x y carry_in = 
+        match x,y with
+        | [], [] -> []
+        | x::xt, y::yt -> 
+            let carry_out, sum = fa x y carry_in in
+            sum :: adder' xt yt carry_out
+        | _ -> failwith "args are not the same size"
+    in
+    concat_lsb (adder' (bits_lsb x) (bits_lsb y) gnd)
+}}}
+
+Lets break this down.
+
+{{{
+let adder x y = 
+}}}
+
+This is the definition of our function. It takes two signals as arguments which must both be the same size.
+
+{{{
+    let rec adder' x y carry_in = 
+}}}
+
+Here we define a recursive internal function which is going to build the adder structure. x and y are lists of bits and carry_in is the current carry value.
+
+{{{
+        match x,y with
+        | [], [] -> []
+        | x::xt, y::yt -> 
+          ...
+        | _ -> failwith "args are not the same size"
+}}}
+
+This part controls the recursion within the function. When both x and y are empty lists the recursion stops.  Otherwise we remove the head bits from each list, and apply the 1 bit full adder (see below). The final case is a catch all clause. This would be executed if one of the lists was empty, but the other was not. That would indicate that the input signals were of different widths, which is an error condition in this function, so the failwith function is called to raise an exception.
+
+{{{
+            let carry_out, sum = fa x y carry_in in
+            sum :: adder' xt yt carry_out
+}}}
+
+These two lines build the one bit adder, connect up the carries and call adder' again to process the next bit.
+
+{{{
+    concat_lsb (adder' (bits_lsb x) (bits_lsb y) gnd)
+}}}
+
+The N-bit signals x and y are split into a list of 1-bit signals (note: bits_lsb places the least significant bit at the head of the list) and passed to the adder' function along with an initial carry_in of 0. The adder' function will generate the adder logic returning the result as a list of N bits which are converted back to a N-bit signal using the concat_lsb function (in which the head of the list becomes the lsb of the result).
+
+Now we have designed the circuit we must test it. To do this we need to generate a simulator.
+
+{{{
+let bits = 8 in
+let circuit = Circuit.create [ output "c" (adder (input "a" bits) (input "b" bits)) ] in
+let sim = Simulator.create circuit in
+}}}
+
+The first step is to create a circuit data type from our logic. In this case we are constructing an 8 bit adder. Note how we are labeling the inputs and outputs of the circuit in order to define the ports. Once we have a circuit the simulator may be created. 
+
+{{{
+let a = sim.port "a" in
+let b = sim.port "b" in
+let c = sim.port "c" in
+}}}
+
+Here we are retrieving the ports from the simulator object. We will be driving data into the simulator using the input ports, and reading data from the simulation using the output ports.
+
+{{{
+sim.reset;
+}}}
+
+The simulator is reset here. Although not strictly needed in this example (there is no sequential logic to reset) it's generally a good idea to reset a circuit before using it for simulation.
+
+{{{
+for i=0 to 9 do
+    a.i <- i;
+    b.i <- i*2;
+    sim.cycle;
+    printf "cycle %i: expecting %i, got %i\n" i (i + (i*2)) c.i
+done
+}}}
+
+This part runs the simulation setting values on the a and b ports and reading the results back through the c port.  Note the `.i` modifier which allows us to access port values as simple integer values (as opposed to the actual underlying uint32 array implementation).
+
+Here are the results.
+
+{{{
+cycle 0: expecting 0, got 0
+cycle 1: expecting 3, got 3
+cycle 2: expecting 6, got 6
+cycle 3: expecting 9, got 9
+cycle 4: expecting 12, got 12
+cycle 5: expecting 15, got 15
+cycle 6: expecting 18, got 18
+cycle 7: expecting 21, got 21
+cycle 8: expecting 24, got 24
+cycle 9: expecting 27, got 27
+}}}

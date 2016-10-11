@@ -1,0 +1,155 @@
+= Simulation =
+
+HDFS provides a cycle based simulator to allow circuit debugging.  It is able to simulate systems with the following restrictions
+
+  * The design must have a single clock (or no clock)
+  * The design must not contain any logic driving a clock or reset pin.
+  * Calculations are 2 state only.  Inouts and tri-states are not allowed.
+  * The simulated circuit cannot contain any instantiations.
+
+In fact HDFS is able to simulate some designs which do not follow these guidelines, however, the simulation will assume that all clocks are synchronous and any logic driving clock or reset pins will be ignored.  Inouts, tri-states and instantiation will cause an exception.
+
+A simulator is constructed from a circuit by calling the `Simulator.create` function.  This results in a simulation datatype with a number of methods for controlling the simulation and accessing port data.
+
+{{{
+let sim = Simulator.create circuit
+sim.reset
+sim.[a].i <- 1
+sim.[b].i <- 2
+sim.cycle
+printf "%i\n" sim.[c].i
+}}}
+
+There are two main methods for controlling a simulation - `reset` and `cycle`
+
+The semantics of the cycle function are:
+
+  * All combinatorial logic is evaluated using the current value of all registers.
+  * After the above is complete, registers are loaded with new values.
+
+The reset function will reset all registers, with an asynchronous reset specified, to their default value.
+
+Simulation is performed using arrays of 32 bit integers.  A signal of width `w` will result in an array of width:
+
+{{{
+(w + 31) / 32
+}}}
+
+Bits 0, 1, 31, 32 and 33 would be accessed using:
+
+{{{
+ 0:  a.(0) &&& 1
+ 1: (a.(0) >>> 1) &&& 1
+31: (a.(0) >>> 31) &&& 1
+32:  a.(1) &&& 1
+33: (a.(1) >>> 1) &&& 1
+}}}
+
+The simulator gives access to inputs, outputs and named wires using the port method:
+
+{{{
+let p = sim.port <node>
+}}}
+
+`node` may be provided using a string name, a `Signal` or a `Uid`.  A lookup style syntax is also provided for accessing ports by a `Signal` argument.  The following port accesses are equivalent:
+
+{{{
+let a = input "a" 1
+...
+let sim = Simulator.create circuit
+let a_port0 = sim.port a
+let a_port1 = sim.port "a"
+let a_port2 = sim.port a.uid
+let a_port3 = sim.[a]
+...
+}}}
+
+A port is an object with some helper methods to access the underlying simulator array in different ways.
+
+Methods for accessing other (unnamed) internal data array's within a simulation are also provided.  This, for example, could be used to write a function which looked up circuit memories and genetated a form with their current data set.
+
+The `record` method wraps up and returns a new simulator object along with resizable arrays of data recorded as the simulation proceeds.
+
+{{{
+let sim = Simulator.create circuit
+let sim,data = sim.record
+}}}
+
+The `combine` method takes two simulators and returns a new simulator.  Ports written on the new simulator will be copied to both of the original simulators.  Output ports (and named wires) will be compared during simulation and if any difference is found a user defined error function called.
+
+{{{
+let sim1 = Simulator.create circuit1
+let sim2 = Simulator.create circuit2
+let errors = ref 0 
+let error_fn s0 s1 = errors := !errors + 1
+let sim = Simulator.combine sim1 sim2 error_fn
+...
+printf "Total number of differences: %i\n" !errors
+}}}
+
+== Simulator API ==
+
+|| *Method* || *Description* ||
+|| sim.reset || Reset registers.  Registers without an asychronous reset and memories hold their previous values. ||
+|| sim.cycle || Cycle the simulator. ||
+|| sim.port s || Finds a port given a `Signal`, `Uid` or string name. ||
+|| sim.inputs || List of simulator input ports. ||
+|| sim.outputs || List of simulator output ports. ||
+|| sim.wires || List of simulator named wires ports. ||
+|| sim.ports || List of all simulator ports. ||
+|| sim.is_input s || Is the string s the name of an input. ||
+|| sim.is_output s || Is the string s the name of an output. ||
+|| sim.is_wire s || Is the string s the name of a wire. ||
+|| sim.[s] || Port lookup based on a `Signal`. ||
+|| sim.record || Returns a new simulator and resizable data array recoding simulation activity.  ||
+|| sim.combine s0 s1 e || Combines two simulators into a single simulator.  The user defined function `e` is called if an output or named wire is different between the simulations. ||
+|| sim.data_node s || Find the internal data node (of type `ArrayBits`) associated with the given `Signal` or `Uid`. ||
+|| sim.reg_node s || Find the internal data node (of type `ArrayBits`) associated with the given `Signal` or `Uid`.  Looks within the register data node map.  ||
+|| sim.mem_lookup s || Given a `Signal` or `Uid` which references a memory array, returns a function which takes an address and returns the current value at that address.  ||
+|| sim.mem_addr s a || Looks up the given memory signal and returns the data at address `a`.  `a` may be an integer or `ArrayBits` type. ||
+|| create || Creates a simulator given a circuit. ||
+
+== Port API ==
+
+Ports are the means by which a testbench communicates with a simulation.  Ports consist of uint32 arrays representing the bits of a Signal.  Various properties derived from the circuit can be accessed through a port object.
+
+|| *Method* || *Description* ||
+|| p.name || Name of port. ||
+|| p.width || Width (in bits) of port. ||
+|| p.data || Internal `ArrayBits` type representing it's current value. ||
+|| p.uid || Uid of port (taken from Uid of the `Signal` the port represents). ||
+|| p.words || Width (in uint32 words) of port. ||
+|| p.[i] || Access to underlying uint32 data array. ||
+
+A number of standard getter/setter properties are defined on ports which make it more convenient to read/write port values as opposed to using the array representation.  For example, to set a 93 bit port to all 1's you can write:
+
+{{{
+  sim.[a].i <- (-1);
+}}}
+
+Or if you prefer hex notation:
+
+{{{
+  sim.[a].hu <- "aab12349c";
+}}}
+
+The following methods use the standard F# numeric literal syntax.
+
+|| *Property* || *Description* ||
+|| p.y || SByte.  Sign extends on get and set. ||
+|| p.uy || Byte.  Zero extends on get and set. ||
+|| p.s || Int16.  Sign extends on get and set. ||
+|| p.us || UInt16.  Zero extends on get and set. ||
+|| p.l || Int32.  Sign extends on get and set. ||
+|| p.ul || UInt32.  Zero extends on get and set.||
+|| p.L || Int64. Sign extends on get and set. ||
+|| p.UL || UInt64.  Zero extends on get and set. ||
+
+The following properties are provided for convenience but follow no specific syntax.
+
+|| *Property* || *Description* ||
+|| p.i || int.  Sign extends on get and set. ||
+|| p.u || int.  Sign extends on set only. ||
+|| p.b || Binary string. ||
+|| p.hu || Hex string.  Zero extends if shorter. ||
+|| p.hs || Hex string.  Sign extends if shorter. ||

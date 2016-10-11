@@ -1,0 +1,60 @@
+"General"
+{
+"ProjectIdGuid" = "{0C7C5B80-DD0D-4D8F-B588-725A255C7A71}"
+}
+"Configurations"
+{
+    "Debug|Win32"
+    {
+    "ProjectType" = "DLL"
+    "OptLevel" = "Off"
+    "StrongNamingLevel" = "None"
+    "OutputPath" = "..\\..\\bin"
+    "SearchPath" = "-I ..\\..\\bin -r hdfs.dll -r hdfslib.dll"
+    "StrongNameFile" = ""
+    "OutputBase" = "xilinx"
+    "CustomCommandLine" = ""
+    "CustomCompiler" = ""
+    "DebugCheck" = "TRUE"
+    "CustomCompilationCheck" = "FALSE"
+    "DebugStartMode" = "0"
+    "StartApp" = ""
+    "StartAppPath" = ""
+    "CustomStartupArguments" = ""
+    }
+    "Release|Win32"
+    {
+    "ProjectType" = "DLL"
+    "OptLevel" = "3"
+    "StrongNamingLevel" = "None"
+    "OutputPath" = "..\\..\\bin"
+    "SearchPath" = "-I ..\\..\\bin -r hdfs.dll -r hdfslib.dll"
+    "StrongNameFile" = ""
+    "OutputBase" = "xilinx"
+    "CustomCommandLine" = ""
+    "CustomCompiler" = ""
+    "DebugCheck" = "FALSE"
+    "CustomCompilationCheck" = "FALSE"
+    "DebugStartMode" = "0"
+    "StartApp" = ""
+    "StartAppPath" = ""
+    "CustomStartupArguments" = ""
+    }
+}
+"Files"
+{
+    "..\\..\\output\\xilinx.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\xilinx\\xilinx_synth.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+}
+"ProjStartupServices"
+{
+}
+"Globals"
+{
+}

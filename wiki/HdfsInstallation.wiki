@@ -1,0 +1,115 @@
+==HDFS Installation==
+
+=Checking out the repository=
+
+From the command line use:
+
+`> svn checkout http://hdfs.googlecode.com/svn/tags/v0_2 .`
+
+This will create a subdirectory called hdfs with the required source and makefiles (current version is 0.2, revision 139).
+
+To get the latest development version use:
+
+`> svn checkout http://hdfs.googlecode.com/svn/trunk .`
+
+_Disclaimer - the development version may not always be in a usable state..._
+
+=General=
+
+HDFS consists of the number of dll's. The main ones are:
+
+  * *hdfs.dll* This contains the most important parts of the API - design, netlisting and integrated simulation.
+  * *hdfslib.dll* This contains various utility circuits and functions, as well as the cosimulator.
+
+In order to support cosimulation and the xilinx library a few other dll's are created:
+
+  * *!NamedPipeNative.dll* This C# based DLL allows F# to access the native windows pipe functions.
+  * *cosim_mti.dll* This is the PLI module that will be linked into the verilog simulator in order to support cosimulation.
+  * *xilinx.dll* This contains functions defining all Xilinx primitives.
+
+=Requirements=
+
+First of all you need a working installation of the .NET 2.0 framework. Googling on ".NET 2.0 redistributable" should provide you with the appropriate link.
+
+The next requirement is the F# compiler. Download it, unpack the archive, then run InstallFSharp.msi (Windows) or install-mono.sh (Linux).
+
+Note: In order to use perform cosimulation and use the xilinx library, Modelsim, C#, Microsoft C++ and Xilinx ISE are required.
+
+=Configuration=
+
+For development a unix style makefile, hdfs.mk, is used with cygwin on a Windows XP platform. Configuration of HDFS is done through the file cfg.mk. The configuration options will be described in terms of this file. There are three parts in particular to consider:
+
+{{{
+###########################################################################
+# General settings
+###########################################################################
+
+# Cosimulation: nothing or mti (modelsim)
+cosim = mti
+
+# Build xilinx lib (takes an age): nothing or true
+xilinx = true
+}}}
+
+To start with ensure cosim and xilinx are not set as they are relatively complex features to compile.
+
+{{{
+###########################################################################
+# f# compiler
+###########################################################################
+
+FSC_PATH = C:\dev\tools\FSharp_1_1_13_8\bin
+
+}}}
+
+Edit FSC_PATH to match your installation of F#.
+
+=Cygwin=
+
+After configuring HDFS typing:
+
+{{{
+> make -f hdfs.mk
+}}}
+
+Will generate the dlls. You can experiment with the other HDFS features as follows
+
+{{{
+> make -f hdfs.mk cosim=mti
+> make -f hdfs.mk xilinx=true
+}}}
+
+=Windows .bat=
+
+For simplicity a .bat file is included which will compile the basic parts of HDFS under windows. You will need to add (FSHARP_DIR)/bin to your path so that it can find the compiler, or edit the bat file appropriately. Only the F# compiler, fsc.exe, is required.
+
+=Linux and mono=
+
+HDFS can be used on Linux through the standard makefile. The following features do not work, however, due to incomplete support of Windows.Forms in mono.
+
+  * Waveforms
+  * Structural viewer (heirform)
+
+The following configurations options are required to enable mono compilation:
+
+{{{
+mono = true
+FSC_PATH = mono ~/dev/FSharp/bin
+}}}
+
+Tested on Fedora core 6 with mono 1.2.2.
+
+=Cosimulation (Modelsim)=
+
+If you want to use cosimulation you are going to need the MS C# and C++ compilers installed and also the lastest Windows SDK. If you are using the full development environment you should be ready to go. Otherwise download "Microsoft Platform SDK for Windows Server 2003 R2". Depending on how your system is set up you may have difficulties locating the windows header and library files. If so the fix can be found [http://forums.microsoft.com/MSDN/ShowPost.aspx?PostID=7004&SiteID=1 here]. The final step is setting up your modelsim path in the MTI variable.
+
+The provided PLI layer may well work with other simulators (but notably not icarus verilog, as it only supports VPI). Also, the pipe implementation used for interprocess communication is Windows only.
+
+=Xilinx library=
+
+The xilinx library can be built by setting the xilinx variable to true, and configuring the XILINX_UNISIM variable to the correct path. An installation of ISE is required (the free webpack will suffice - currently tested using unisim_VCOMP.vhd from 8.1.0 and 8.2.3).
+
+{{{
+# Path to unisim source file
+XILINX_UNISIM = "C:\dev\tools\xilinx\vhdl\src\unisims\unisim_VCOMP.vhd"
+}}}

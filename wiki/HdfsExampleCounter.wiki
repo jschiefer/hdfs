@@ -1,0 +1,61 @@
+=Counter=
+
+First of all here is a structural description of a counter.
+
+{{{
+let counter_structural load init = 
+  let d = wire (width init) in
+  let q = regc enable d in
+  d <== mux2 load init (q + 1);
+  q
+}}}
+
+In this example we are creating a wire which is input to a register.  The wire is then driven by either `init` or the output of the register plus one depending on the value of `load`.  This closes a loop around the register where it's output is feeding back to it's input (via some combinatorial logic).
+
+An alternative description uses the behavioural code capabilities of HDFS:
+
+{{{
+let counter_behavioral load init = 
+  let cnt = b_regc enable (width init) in
+  behave [
+    b_if (load) [
+      cnt $== init;
+    ] [
+      cnt $== cnt.q + 1;
+    ]
+  ];
+  cnt.q
+}}}
+
+Here a behavioural register is created.  The behavioural code uses an if statement to control whether the `init` value or next counter value is loaded.
+
+Now lets look at an even shorter way to implement this counter.
+
+{{{
+let counter_structural_fb load init = 
+  regc_fb enable (fun d -> mux2 load init (d + 1)) (width init)
+}}}
+
+This example uses `regc_fb` - a predefined function in the HDFS library.  It's signature is:
+
+{{{
+signal_t -> (signal_t -> signal_t) -> int -> signal_t
+}}}
+
+The function takes three arguments: 
+
+  # the register enable
+  # a function which takes the current register value and returns the next register value
+  # the width of the register 
+
+Here's the definition of regc_fb.  Note the similarity to counter_structural.
+
+{{{
+let regc_fb ena fn width = 
+  let d = wire width in
+  let q = regc ena d in
+  d <== fn q;
+  q
+}}}
+
+This is a simple example of how higher order functions can help abstract common design paradigms.

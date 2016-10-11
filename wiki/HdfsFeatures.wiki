@@ -1,0 +1,18 @@
+*Version 0.2*
+
+  * Digital logic circuit design in F#
+  * Structural and behavioural design styles
+  * VHDL and Verilog netlist generation
+  * Memory inference
+  * Instantiation of external Verilog or VHDL models
+  * Integrated simulator
+  * Verilog co-simulation (modelsim only at the moment)
+  * C, C++, C# and Simulink simulation generation
+  * Integrated waveform viewer
+  * Resource reporting
+  * Tree based heirarchy viewer
+  * Growing library of utility circuits and functions
+  * Fixed point arithmetic API
+  * HDCaml compatibility API
+  * Interface to Xilinx library components
+  * Basic Xilinx FPGA synthesis capabilities

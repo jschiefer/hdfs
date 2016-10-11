@@ -1,0 +1,1035 @@
+# Reading C:/dev/tools/modelsim61f/tcl/vsim/pref.tcl 
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+# ** Error: test.vhd(35): (vcom-1136) Unknown identifier "lo".
+# ** Error: test.vhd(38): near "begin": expecting: ';'
+# ** Error: test.vhd(85): near "architecture": expecting: ';'
+# ** Error: c:/dev/tools/modelsim61f/win32pe/vcom failed.
+# Error in macro ./build.do line 7
+# c:/dev/tools/modelsim61f/win32pe/vcom failed.
+#     while executing
+# "vcom test.vhd"
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+# ** Error: test.vhd(35): No feasible entries for subprogram "to_ufixed".
+# ** Error: test.vhd(38): near "begin": expecting: ';'
+# ** Error: test.vhd(85): near "architecture": expecting: ';'
+# ** Error: c:/dev/tools/modelsim61f/win32pe/vcom failed.
+# Error in macro ./build.do line 7
+# c:/dev/tools/modelsim61f/win32pe/vcom failed.
+#     while executing
+# "vcom test.vhd"
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+# ** Error: test.vhd(35): No feasible entries for subprogram "to_ufixed".
+# ** Error: test.vhd(35): Function call returns type (error); expecting type unresolved_ufixed.
+# ** Error: test.vhd(38): near "begin": expecting: ';'
+# ** Error: test.vhd(85): near "architecture": expecting: ';'
+# ** Error: c:/dev/tools/modelsim61f/win32pe/vcom failed.
+# Error in macro ./build.do line 7
+# c:/dev/tools/modelsim61f/win32pe/vcom failed.
+#     while executing
+# "vcom test.vhd"
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+# ** Error: test.vhd(35): No feasible entries for subprogram "to_ufixed".
+# ** Error: test.vhd(35): Function call returns type (error); expecting type unresolved_ufixed.
+# ** Error: test.vhd(38): near "begin": expecting: ';'
+# ** Error: test.vhd(85): near "architecture": expecting: ';'
+# ** Error: c:/dev/tools/modelsim61f/win32pe/vcom failed.
+# Error in macro ./build.do line 7
+# c:/dev/tools/modelsim61f/win32pe/vcom failed.
+#     while executing
+# "vcom test.vhd"
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+# ** Error: test.vhd(35): No feasible entries for subprogram "to_ufixed".
+# ** Error: test.vhd(35): Function call returns type (error); expecting type unresolved_ufixed.
+# ** Error: test.vhd(85): VHDL Compiler exiting
+# ** Error: c:/dev/tools/modelsim61f/win32pe/vcom failed.
+# Error in macro ./build.do line 7
+# c:/dev/tools/modelsim61f/win32pe/vcom failed.
+#     while executing
+# "vcom test.vhd"
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+vsim fix -Giwidth=3 -Gifix=1 -Gowidth=4 -Gofix=2
+# vsim -Gifix=1 -Giwidth=3 -Gofix=2 -Gowidth=4 fix 
+# //  ModelSim PE 6.1f May 12 2006 
+# //
+# //  Copyright 2006 Mentor Graphics Corporation
+# //              All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND 
+# //  PROPRIETARY INFORMATION WHICH IS THE PROPERTY
+# //  OF MENTOR GRAPHICS CORPORATION OR ITS LICENSORS
+# //  AND IS SUBJECT TO LICENSE TERMS.
+# //
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+vsim fix -Giwidth=3 -Gifix=1 -Gowidth=4 -Gofix=2; run
+# vsim -Gifix=1 -Giwidth=3 -Gofix=2 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 00.00     (0.000000e+000)
+# 00.10     (5.000000e-001)
+# 01.00     (1.000000e+000)
+# 01.10     (1.500000e+000)
+# ** Warning: :ieee_proposed:fixed_pkg:TO_SFIXED(REAL): vector truncated
+#    Time: 0 ns  Iteration: 0  Instance: /fix
+# 01.10     (1.500000e+000)
+# ** Warning: :ieee_proposed:fixed_pkg:TO_SFIXED(REAL): vector truncated
+#    Time: 0 ns  Iteration: 0  Instance: /fix
+# 01.10     (1.500000e+000)
+# ** Warning: :ieee_proposed:fixed_pkg:TO_SFIXED(REAL): vector truncated
+#    Time: 0 ns  Iteration: 0  Instance: /fix
+# 01.10     (1.500000e+000)
+# ** Warning: :ieee_proposed:fixed_pkg:TO_SFIXED(REAL): vector truncated
+#    Time: 0 ns  Iteration: 0  Instance: /fix
+# 01.10     (1.500000e+000)
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+# ** Error: test.vhd(68): No feasible entries for infix operator "-".
+# ** Error: test.vhd(68): Cannot resolve expression type of infix expression.
+# ** Error: test.vhd(68): Illegal type conversion to real (operand type is not known).
+# ** Error: test.vhd(77): VHDL Compiler exiting
+# ** Error: c:/dev/tools/modelsim61f/win32pe/vcom failed.
+# Error in macro ./build.do line 7
+# c:/dev/tools/modelsim61f/win32pe/vcom failed.
+#     while executing
+# "vcom test.vhd"
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+vsim fix -Giwidth=3 -Gifix=1 -Gowidth=4 -Gofix=2; run
+# vsim -Gifix=1 -Giwidth=3 -Gofix=2 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 10.00     (-2.000000e+000)
+# 10.10     (-1.500000e+000)
+# 11.00     (-1.000000e+000)
+# 11.10     (-5.000000e-001)
+# 00.00     (0.000000e+000)
+# 00.10     (5.000000e-001)
+# 01.00     (1.000000e+000)
+# 01.10     (1.500000e+000)
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+vsim fix -Giwidth=3 -Gifix=1 -Gowidth=4 -Gofix=2; run
+# vsim -Gifix=1 -Giwidth=3 -Gofix=2 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 10.00     (-2.000000e+000)
+# 10.10     (-1.500000e+000)
+# 11.00     (-1.000000e+000)
+# 11.10     (-5.000000e-001)
+# 00.00     (0.000000e+000)
+# 00.10     (5.000000e-001)
+# 01.00     (1.000000e+000)
+# 01.10     (1.500000e+000)
+vsim fix -Giwidth=1 -Gifix=0 -Gowidth=1 -Gofix=0; run
+# vsim -Gifix=0 -Giwidth=1 -Gofix=0 -Gowidth=1 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 1     (-1.000000e+000)
+# 0     (0.000000e+000)
+vsim fix -Giwidth=1 -Gifix=1 -Gowidth=1 -Gofix=1; run
+# vsim -Gifix=1 -Giwidth=1 -Gofix=1 -Gowidth=1 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# .1     (-5.000000e-001)
+# .0     (0.000000e+000)
+vsim fix -Giwidth=1 -Gifix=2 -Gowidth=1 -Gofix=2; run
+# vsim -Gifix=2 -Giwidth=1 -Gofix=2 -Gowidth=1 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 1     (-2.500000e-001)
+# 0     (0.000000e+000)
+vsim fix -Giwidth=4 -Gifix=2 -Gowidth=3 -Gofix=1; run
+# vsim -Gifix=2 -Giwidth=4 -Gofix=1 -Gowidth=3 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 10.0     (-2.000000e+000)
+# 10.0     (-2.000000e+000)
+# 10.1     (-1.500000e+000)
+# 11.0     (-1.000000e+000)
+# 11.0     (-1.000000e+000)
+# 11.0     (-1.000000e+000)
+# 11.1     (-5.000000e-001)
+# 00.0     (0.000000e+000)
+# 00.0     (0.000000e+000)
+# 00.0     (0.000000e+000)
+# 00.1     (5.000000e-001)
+# 01.0     (1.000000e+000)
+# 01.0     (1.000000e+000)
+# 01.0     (1.000000e+000)
+# 01.1     (1.500000e+000)
+# 01.1     (1.500000e+000)
+vsim fix -Giwidth=5 -Gifix=3 -Gowidth=4 -Gofix=2; run
+# vsim -Gifix=3 -Giwidth=5 -Gofix=2 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 10.00     (-2.000000e+000)
+# 10.00     (-2.000000e+000)
+# 10.01     (-1.750000e+000)
+# 10.10     (-1.500000e+000)
+# 10.10     (-1.500000e+000)
+# 10.10     (-1.500000e+000)
+# 10.11     (-1.250000e+000)
+# 11.00     (-1.000000e+000)
+# 11.00     (-1.000000e+000)
+# 11.00     (-1.000000e+000)
+# 11.01     (-7.500000e-001)
+# 11.10     (-5.000000e-001)
+# 11.10     (-5.000000e-001)
+# 11.10     (-5.000000e-001)
+# 11.11     (-2.500000e-001)
+# 00.00     (0.000000e+000)
+# 00.00     (0.000000e+000)
+# 00.00     (0.000000e+000)
+# 00.01     (2.500000e-001)
+# 00.10     (5.000000e-001)
+# 00.10     (5.000000e-001)
+# 00.10     (5.000000e-001)
+# 00.11     (7.500000e-001)
+# 01.00     (1.000000e+000)
+# 01.00     (1.000000e+000)
+# 01.00     (1.000000e+000)
+# 01.01     (1.250000e+000)
+# 01.10     (1.500000e+000)
+# 01.10     (1.500000e+000)
+# 01.10     (1.500000e+000)
+# 01.11     (1.750000e+000)
+# 01.11     (1.750000e+000)
+do build.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# ** Warning: (vlib-34) Library already exists at "ieee_proposed".
+# Modifying modelsim.ini
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Compiling package math_utility_pkg
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Compiling package fixed_pkg
+# -- Loading package math_real
+# -- Compiling package body fixed_pkg
+# -- Loading package fixed_pkg
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1478): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1479): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(1480): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/fixed_pkg_c.vhdl(6891): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package textio
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package fixed_pkg
+# -- Compiling package float_pkg
+# -- Compiling package body float_pkg
+# -- Loading package float_pkg
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1016): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(1017): Range 0 downto 1 is null.
+# ** Warning: [3] ieee/float_pkg_c.vhdl(6191): Range 2 to 1 is null.
+# Model Technology ModelSim PE vcom 6.1f Compiler 2006.05 May 12 2006
+# -- Loading package standard
+# -- Loading package std_logic_1164
+# -- Loading package numeric_std
+# -- Loading package math_utility_pkg
+# -- Loading package textio
+# -- Loading package fixed_pkg
+# -- Loading package float_pkg
+# -- Compiling entity fix
+# -- Compiling architecture test of fix
+vsim fix -Giwidth=5 -Gifix=3 -Gowidth=4 -Gofix=2; run
+# vsim -Gifix=3 -Giwidth=5 -Gofix=2 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 10.00     (-2.000000e+000)
+# 10.00     (-2.000000e+000)
+# 10.01     (-1.750000e+000)
+# 10.10     (-1.500000e+000)
+# 10.10     (-1.500000e+000)
+# 10.10     (-1.500000e+000)
+# 10.11     (-1.250000e+000)
+# 11.00     (-1.000000e+000)
+# 11.00     (-1.000000e+000)
+# 11.00     (-1.000000e+000)
+# 11.01     (-7.500000e-001)
+# 11.10     (-5.000000e-001)
+# 11.10     (-5.000000e-001)
+# 11.10     (-5.000000e-001)
+# 11.11     (-2.500000e-001)
+# 00.00     (0.000000e+000)
+# 00.00     (0.000000e+000)
+# 00.00     (0.000000e+000)
+# 00.01     (2.500000e-001)
+# 00.10     (5.000000e-001)
+# 00.10     (5.000000e-001)
+# 00.10     (5.000000e-001)
+# 00.11     (7.500000e-001)
+# 01.00     (1.000000e+000)
+# 01.00     (1.000000e+000)
+# 01.00     (1.000000e+000)
+# 01.01     (1.250000e+000)
+# 01.10     (1.500000e+000)
+# 01.10     (1.500000e+000)
+# 01.10     (1.500000e+000)
+# 01.11     (1.750000e+000)
+# 01.11     (1.750000e+000)
+vsim fix -Giwidth=5 -Gifix=3 -Gowidth=4 -Gofix=1; run
+# vsim -Gifix=3 -Giwidth=5 -Gofix=1 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 110.0     (-2.000000e+000)
+# 110.0     (-2.000000e+000)
+# 110.0     (-2.000000e+000)
+# 110.1     (-1.500000e+000)
+# 110.1     (-1.500000e+000)
+# 110.1     (-1.500000e+000)
+# 111.0     (-1.000000e+000)
+# 111.0     (-1.000000e+000)
+# 111.0     (-1.000000e+000)
+# 111.0     (-1.000000e+000)
+# 111.0     (-1.000000e+000)
+# 111.1     (-5.000000e-001)
+# 111.1     (-5.000000e-001)
+# 111.1     (-5.000000e-001)
+# 000.0     (0.000000e+000)
+# 000.0     (0.000000e+000)
+# 000.0     (0.000000e+000)
+# 000.0     (0.000000e+000)
+# 000.0     (0.000000e+000)
+# 000.1     (5.000000e-001)
+# 000.1     (5.000000e-001)
+# 000.1     (5.000000e-001)
+# 001.0     (1.000000e+000)
+# 001.0     (1.000000e+000)
+# 001.0     (1.000000e+000)
+# 001.0     (1.000000e+000)
+# 001.0     (1.000000e+000)
+# 001.1     (1.500000e+000)
+# 001.1     (1.500000e+000)
+# 001.1     (1.500000e+000)
+# 010.0     (2.000000e+000)
+# 010.0     (2.000000e+000)
+vsim fix -Giwidth=5 -Gifix=3 -Gowidth=4 -Gofix=0; run
+# vsim -Gifix=3 -Giwidth=5 -Gofix=0 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 1110     (-2.000000e+000)
+# 1110     (-2.000000e+000)
+# 1110     (-2.000000e+000)
+# 1110     (-2.000000e+000)
+# 1110     (-2.000000e+000)
+# 1111     (-1.000000e+000)
+# 1111     (-1.000000e+000)
+# 1111     (-1.000000e+000)
+# 1111     (-1.000000e+000)
+# 1111     (-1.000000e+000)
+# 1111     (-1.000000e+000)
+# 1111     (-1.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0001     (1.000000e+000)
+# 0001     (1.000000e+000)
+# 0001     (1.000000e+000)
+# 0001     (1.000000e+000)
+# 0001     (1.000000e+000)
+# 0001     (1.000000e+000)
+# 0001     (1.000000e+000)
+# 0010     (2.000000e+000)
+# 0010     (2.000000e+000)
+# 0010     (2.000000e+000)
+# 0010     (2.000000e+000)
+vsim fix -Giwidth=5 -Gifix=3 -Gowidth=4 -Gofix=-1; run
+# vsim -Gifix=3 -Giwidth=5 -Gofix=-1 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+vsim fix -Giwidth=5 -Gifix=3 -Gowidth=4 -Gofix=-1; run
+# vsim -Gifix=3 -Giwidth=5 -Gofix=-1 -Gowidth=4 fix 
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.standard
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.std_logic_1164(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.numeric_std(body)
+# Loading ieee_proposed.math_utility_pkg
+# Loading c:\dev\tools\modelsim61f\win32pe/../std.textio(body)
+# Loading c:\dev\tools\modelsim61f\win32pe/../ieee.math_real(body)
+# Loading ieee_proposed.fixed_pkg(body)
+# Loading ieee_proposed.float_pkg(body)
+# Loading work.fix(test)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 1111     (-2.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0000     (0.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+# 0001     (2.000000e+000)
+exit

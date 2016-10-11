@@ -1,0 +1,202 @@
+----------------------------------------------------------------
+----------------------------------------------------------------
+General
+----------------------------------------------------------------
+----------------------------------------------------------------
+
+* Set up new website.  Perferably 1 month before old one disappears.
+
+--------
+hdfs.lib
+--------
+
+* Rewrite simulator
+  - In progress: simulator2.ml
+
+* Improve/complete documentation
+  - hdl documentation
+  - html documentation (drop pdf or auto generate)
+
+* Finish EDIF writer (and Xilinx synthesizer)
+
+* Complete type and namespace reorganization
+
+-----------
+hdfslib.dll
+-----------
+
+* Fix odd-even merge sort pipelining
+
+* Complete ATS generator for optimised systems.
+  - Add fifos, arrays etc
+
+* Remove bits from util library which have moved to hdfs.dll
+
+* Merge xilinx parser into vhdl parser project.
+  - Update parser to deal with Atera componments.
+  - Will need to deal with types more generally.
+  
+* Make test code more sensible and comprehensive.  Consider NUint.
+
+* Find out whats wrong with the cordic application and post
+
+* Update waveform viewer (and other graphical apps)
+
+* Complete xilinx synthesizer.  
+  - Rams, multipliers
+
+* Altera synthesizer.
+  - Use lpms (this, thankfully) should be quite easy.
+
+* Integrate graphview properly 
+  - glee should not be required
+
+* COmplete HDCaml compatibility layer 
+  - simulator 32-31 bit conversion
+
+----------------------------------------------------------------
+----------------------------------------------------------------
+VERSION 0.1
+----------------------------------------------------------------
+----------------------------------------------------------------
+
+--------
+circuits
+--------
+
+* Added a missing check in (<==) wire assignments to ensure widths are
+  the same.  This broke instantiation because a Signal_inst node does
+  not have a width.  
+  > Now everything expect instantiations are checked.
+    Need to make sure the instatiation functions (inst, instg, instgio)
+    make this check, if it is possible.
+
+* Write constants in VHDL as proper constants (maybe something similar for 
+  verilog)
+
+* Simple optimisation of nodes in circuits - filtering equal nodes, constant 
+  propogation
+
+resolved:
+
+* Without name mangling (on wires) its possible to generate circuits that 
+  wont work for no good reason
+  > Done
+  
+* Registers must have a configurable reset value
+  > Done
+
+* Not totally sure if the clock/reset logic (which allows user defined clocks 
+  and resets) is either sensible or implemented correctly especially regarding 
+  the generators.  Certainly a bit iffy for instantiation.
+  > Made clocks and resets general logic.
+
+* Memories
+  > Implemented.  Not sure about scheduling (f# generation and simulation).
+    Not sure if I like the "extra" signal which is added (could be more
+    localized with a decent mangler).  Need to add address/data register
+    to build proper rams and synthesis.  Full two port ram also, if
+    inference allows it.
+
+* Instantiation
+  > Implemented.  The behaviour of wires/logic connected to the instantiations
+    inputs/outputs needs to be checked.  Clocks/resets need some thought,
+    especially for elaboration and those silly ==>@ / ==>~ operators.
+  > Clocks and resets are no longer special.  Well, unless you try and use
+    the simulator anyway.
+
+* Try and remove the wires used to pad registers
+  > Done.  Caused some hassle in the F# generator which now has to schedule
+    the circuit.  Not 100% sure it's totally robust, but it passes all current
+    current tests.
+
+* Make outputs named wires
+  > Done
+
+* Create an intermediate data structure used by the code generators and 
+  simulator
+  > Done.  Use Circuit.create [ outputs ]
+
+* An output wire which is not driven causes it to be detected as an input.  
+  This'll probably go away with the outputs = wires changes
+  > This doesnt happen anymore due to checks during circuit creation
+
+* It strikes me the use of Set.exists is wrong.  I was looking for a search 
+  over the set which took O(logN), but I think this function will take O(N).
+  > Fixed.  Should have been using Set.mem instead
+  
+----------
+simulation
+----------
+
+* A bug was found with registers which required them to update there value
+  at the end of a cycle.  As far as I can tell this works fine internally
+  for the simulator.  However, when you try and read an output signal which
+  was combinatorially connected to a register and use that to calculate
+  the next  value of some input you do not get the right value.  As far as I
+  can tell the waveform view is correct though.  Hmmm, how to fix this.
+  Some method of calculating combinatorially connected output logic after
+  the register update might work.  Alternatively we could try an event
+  driven simulator instead.
+
+* Make a testbench for the array based simulator.  Might make sense to wait 
+  for co-simulation (VPI) though.  
+  > At least partially complete now
+
+resolved:
+
+* The simulation and cosimulation data structures should be unified to both
+  use the port_t type.
+  > Done
+
+* Add VPI layer
+  > Got some basic signal reading working from 
+    (http://www.asic-world.com/verilog/pli.html).
+    The code there is VERY old and doesnt work with my modelsim, let alone
+    iverilog.  Still its the best I've yet found.  Problem are how to write
+    a signal and update properly.
+  > A modelsim version is working based on PLI.  Icarus verilog is being 
+    difficult by not supporting PLI.  Oh well...
+
+* Make the waveform viewer use the operations record in the simulator so it 
+  can support the same datatypes
+  > Done
+
+* Add more display options for signals in the waveform viewer
+  > Done
+
+* Waveform renderer should only redraw the client area (performance issue)
+  > Done. One possible issue is does the viewer still support data arrays 
+    with different lengths (not something I am currently using)
+
+* Redo the reset tasks to a seperate pass through registers
+  > Done
+
+* Add array based simulator
+  > Written.  Needs testing.
+
+* Optimise the simulator scheduler
+  > Done.  Should be O(N.lgN) rather than O(N^2).  Seems pretty fast anyway.
+
+-------------
+behave blocks
+-------------
+
+* Fix and improve the behavioural code optimiser
+
+* Check the simulation semantics properly
+  > It was very broken, but seems much better now.  Need more testcases.
+
+resolved:
+
+* Behave constructs should use b_reg & b_wire tuples which carry the 
+  feedback loop
+  > Done
+
+* Infer feedback loop for registers in behavioural blocks
+  > Done using the approach above instead
+
+* Fix constants in behavioural cases statements
+  > Fixed.  Problem was simulator needed data value for the constant to look 
+    up.  Now they are treated specially so the constants dont need to be 
+    dependants.

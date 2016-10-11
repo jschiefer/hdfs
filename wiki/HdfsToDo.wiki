@@ -1,0 +1,62 @@
+=To do=
+
+==version 0.3==
+
+===Synthesis===
+
+  * EDIF generator
+  * RAM support
+  * Behave block support
+  * Optimise logic.  In particular signed multipliers are not optimal and when we have operators with very small operands we can usually do better than use the generic transformations provided.
+
+===General===
+
+  * Complete .[,] notation for part selects on behavioral nodes
+
+===VHDL/Verilog parsers===
+ 
+  * I'd like to put togther basic VHDL and Verilog parsers
+  * The main focus should be getting a reasonable amount of code to parse then extracting component/module/entity definitions.  This is intended to replace the current VHDL parser built for the Xilinx library so it can be used to also parse Altera/Lattice etc libraries.  Further it would give an automatic way to generate instantiation functions for external HDL models.
+  * Later it would interesting to see if we could convert VHDL and Verilog to HDFS circuits.
+
+===Waveforms===
+
+  * At the moment the simulator uses a hacked version of the old waveform viewer module.  The waveform viewer should be revised to use the new simulator directly.
+  * At the same time the waveform viewer desperately needs updating.  Dynamically resizing the waveform and searching for transitions are my two most missed features.  Better performance would also be nice.
+  * Add the ability to generate vcd traces
+
+==version 0.2==
+
+The main things to get working for this release are the revised simulator and completing the basic synthesis capabilities.  Along side this I want to revise the circuit and simulation APIs.
+
+*Update* - I've been busy, not on HDFS but at work.  As such getting absolutely everything I wanted done hasn't been possible.  Since (I think) the new API is a real improvement over the old one I have decided to release V0.2 as is.  _Most_ things are pretty much done anyway.
+
+===New simulator===
+
+  * This will be a fully array based simulator with better internal optimisation of arithmetic operations.  An interface allowing different data types on ports will be provided.
+  * New sytax for accessing ports using the .[] operator
+    * let a = sim.["a"].data
+    * let a_width = sim.["a"].width
+    * *done*
+  * Fix buggy memory scheduling
+    * *done*
+  * Change scheduler to account for combinatorial logic driving outputs.
+    * *done*
+  * Revise cosimulator as appropriate (may not need anything done to it).
+    * *done*
+
+===Synthesis===
+  
+  * Finish EDIF writer.  Basic EDIFs almost working.  Biggest thing remaining is describing busses.
+  * Add missing primitives to xilinx synthesizer.  Still to do:
+    * Distributed and block memories (easy)
+    * Multipliers (hard - at least for a reasonable implementation).  Both LUT and DSP48 based versions needed.
+      * *lut based signed/unsigned done*
+    * Conversion of behave blocks to structural code.  Old behave code for HDCaml did this transformation and will provide a starting point.  Want to try and improve on that by inverting the AST in one pass.
+
+===General===
+
+  * Move UFixed and SFixed types over to new API
+  * Clean up the Circuit and Simulation modules in the same fashion as the Signal type ie using the !CompilationRepresentation flags to export a module and a type.
+    * *done*
+  * Try to integrate the cosim_pipe module into F#

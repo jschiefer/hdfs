@@ -1,0 +1,63 @@
+=Hello World=
+
+First of all lets look at a couple of ways to use the HDFS library with some simple examples. We start by using fsi.exe - the F# interpreter. This works a bit like a fancy calculator allowing you to type code and immediately get results. Try the following code, starting in the HDFS installation directory.
+
+{{{
+> make -f hdfs.mk
+> fsi -r bin/hdfs.dll
+MSR F# Interactive, (c) Microsoft Corporation, All Rights Reserved
+F# Version 1.1.13.8, compiling for .NET Framework Version v2.0.50727
+...
+> System.Console.WriteLine("Hello world from HDFS version {0}", DigitalLogic.Signal.hdfs_version);;
+Hello world from HDFS version 0.1
+val it : unit = ()
+> #quit;;
+}}}
+
+Let's break down what just happened.
+
+{{{
+> make -f hdfs.mk
+}}}
+
+This command will build the HDFS library, and various other support libraries depending on the settings in cfg.mk.
+
+{{{
+> fsi -r bin/hdfs.dll
+MSR F# Interactive, (c) Microsoft Corporation, All Rights Reserved
+F# Version 1.1.13.8, compiling for .NET Framework Version v2.0.50727
+...
+}}}
+
+This runs the F# interpreter telling it to load the main HDFS library.
+
+{{{
+> System.Console.WriteLine("Hello world from HDFS version {0}", DigitalLogic.Signal.hdfs_version);;
+Hello world from HDFS version 0.1
+val it : unit = ()
+}}}
+
+This calls the .NET WriteLine function which says hello and prints the HDFS version string.
+
+{{{
+> #quit;;
+}}}
+
+This exits fsi.
+
+Now lets do the same thing using the F# compiler, fsc.exe.
+
+{{{
+let hello_world () = 
+  System.Console.WriteLine("Hello world from HDFS version {0}", DigitalLogic.Signal.hdfs_version)
+do hello_world()
+}}}
+
+To generate the program type:
+
+{{{
+> fsc -r bin/hdfs.dll hdfs/lib/tutorial/hello.ml
+> ./hello.exe
+Hello world from HDFS version 0.1
+> ...
+}}}

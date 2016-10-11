@@ -1,0 +1,394 @@
+= HDFS Design API =
+
+Building a hardware module in HDFS consists of constructing a cyclic abstract syntax
+tree using the _Signal_ datatype.  This datatype may then be processed in order to
+construct VHDL or Verilog netlists or perform simulation.
+
+The following short example illustrates the basic process of hardware design in HDFS.
+
+First we need to create the hardware design itself.
+
+{{{
+let some_hardware a (b:Signal) (c:Signal) =
+  let d = regc enable (a + b) in
+  (d <<< 1) - c + d.[0,0].mux2(2, a) 
+}}}
+
+The module is abstracted as a function which takes 3 signals, performs some (meaningless)
+operation on them, and returns 1 signal.
+
+When called the function `some_hardware` will generate an abstract syntax tree representing the hardware.  This can then be converted into a circuit datatype from
+which netlists can be written or simulation performed:
+
+{{{
+  let d = some_hardware (input "a" 2) (input "b" 2) (input "c" 2) in
+  let circuit = Circuit.create [ d.output "d" ] in
+  Circuit.write_file Verilog.write "output/" "test" ".v" circuit;
+  Circuit.write_file Vhdl.write "output/" "test" ".vhd" circuit;
+  let sim = Simulator.create circuit in
+  ...
+}}}
+
+=== HDFS operators ===
+
+Where possible standard F# operators are used in the API.  F#, however, places
+some restrictions on the types of arguments that may be used.  In these cases operators
+ending with a `:` (unsigned) or `+` (signed) are provided.  Sometimes both versions
+are provided in order to allow overloading of the operators.
+
+There is an issue with the API regarding operator overloading.  ML style type inference and operator (and function) overloading are not easy bedfellows.  Often in simple functions you may receive type errors. For example:
+
+{{{
+> let compare a b = a <: b;;
+
+  let compare a b = a <: b;;
+  ------------------^^^^^^^
+
+stdin(8,18): error: FS0001: Type error in the use of the overloaded operator '(<: )'. The type 'int' does not support any operators named '<:' 
+stopped due to error
+
+> let compare (a:Signal) b = a <: b;;
+
+  let compare (a:Signal) b = a <: b;;
+  ---------------------------^^^^^^^
+
+stdin(7,27): error: Could not resolve the ambiguity inherent in the use of the overloaded operator '( <: )' at or near this program point. Use type annotations to resolve the ambiguity.
+stopped due to error
+}}}
+
+In these cases it is necessary to constrain the type of the overloaded argument.
+
+{{{
+> let compare a (b:Signal) = a <: b;;
+
+val compare : Signal -> Signal -> Signal
+}}}
+
+== Constants ==
+
+|| *Function* || *Description* ||
+|| `constb v` || Creates a constant from a string of 0's and 1's ie `constb "1010"`||
+|| `consti w v` || Creates a constant of width w from the integer value v ie `consti 4 10` ||
+|| `consthu w v` || Creates a constant of width w from the hex value v encoded in a string ie `consthu 4 "a"`.  If the _hex string_ represents a _binary value_ shorter than the expected width it is padded with zeros. ||
+|| `consths w v` || Creates a constant of width w from the hex value v encoded in a string ie `consthu 4 "a"`.  If the _hex string_ represents a _binary value_ shorter than the expected width it is padded with the most significant bit of the hex value. ||
+|| `constbi w v` || Creates a constants of width w from the Big_int v ie `constbi 4 (big_int_of_string "10")` ||
+|| `const1h w v` || Creates a one-hot vector of width w from an integer specifying which bit to set (which must be less than the width).  The lsb is bit 0 and the msb is bit (width-1) ie `const1h 4 0` == `"0001"`, `const1h 4 3` == `"1000"` ||
+|| `zero w` || Creates the constant 0 (ie all bits set to 0) of width w ||
+|| `one w` || Creates the constant 1 of width w ||
+|| `ones w` || Creates the constant -1 (ie all bits set to 1) of width w ||
+|| `constv v` || Creates a constant from a string using verilog style formatting.  See below. ||
+
+===Verilog style constants===
+
+Constants may written as strings using a style similar to verilog.  For example,
+
+`"5'b01001"`
+
+specifies the a 5 bit constant with the value 9.  The format of the string is
+
+`"<width>'<base><value>"`
+
+Base defines what characters the value may contain.  If the value provided is larger than width then the result is truncated.  If it is shorter then the value is either zero extended or sign extended depending on the control character used.
+
+|| *Control character* || *Extension strategy* || *Description* || 
+|| `b` || zero || Binary constant ||
+|| `B` || sign || Binary constant ||
+|| `h` or `x` || zero || Hexadecimal constant ||
+|| `H` or `X` || sign || Hexadecimal constant ||
+|| `d` || n/a || Decimal constant (internally uses Big_ints, so may be greater then 32 bits) ||
+
+Some operators and functions are able to operate directly on strings in this style.  
+In these cases the width is optional and if omitted will be inferred from the
+context.
+
+=== Constant optimization ===
+
+As signals are combined constant arguments are detected and will be used evaluate the result directly when possible.  This implements a form of constant propagation optimization.  Note that this optimization does not work with wires even if the argument is a constant.
+
+This optimization is applied by default but may be disabled by setting `Signal.constant_propogation` to false ie
+
+{{{
+  constant_propogation := false;
+}}}
+
+=== Predefined constants and signals ===
+
+|| *Name* || *Description* ||
+|| `vdd` || Logical 1 ||
+|| `gnd` || Logical 0 ||
+|| `empty` || The empty signal. ||
+|| `clock` || Predefined clock signal ||
+|| `reset` || Predefined asynchronous reset signal ||
+|| `enable` || Predefined clock enable signal ||
+
+== Arithmetic ==
+
+|| *Function* || *Description* ||
+|| `a + b` or `add a b` || Addition.  Both arguments and result have the same width ||
+|| `a - b` or `sub a b` || Subtraction.  Both arguments and result have the same width ||
+|| `a * b` or `mulu a b` || Unsigned multiplication.  The results width is the sum of the widths of the arguments ||
+|| `a *+ b` or `muls a b` || Signed multiplication.  The results width is the sum of the widths of the arguments ||
+|| `~- a` or `negate a` || (Unary) Negation.  Result has the same width as the argument.  In F# `-` can be used as a shortcut for `~-` ||
+
+The binary operators are overloaded so that the right hand argument may be an integer or verilog style string.  For addition and subtraction the right hand operand will be converted to a constant with the same width as the left operand.  For multiplication the rules are more complex.
+
+|| *Function* || *Right operand type* || *Width of operand* ||
+|| `*` || int || Width large enough to accommodate the int value.  Value should be positive.  If the value is a power of two the multiplication will be turned into a shift. ||
+|| `*` || string || Width of the left operand, unless width specified as part of the constant ||
+|| `*+` || int || Width large enough to accommodate the int value assuming a twos complement representation  ||
+|| `*+` || string || Width of the left operand, unless width specified as part of the constant ||
+
+== Bit manipulation ==
+
+|| *Function* || *Description* ||
+|| `select s hi lo` or `s.[hi,lo]` || Selects a range of bits.  `hi` must be greater than or equal to `lo`. ||
+|| `bit s n` or `s.bit n` || Select bit `n` from `s` ||
+|| `bits s` or `s.bits` || Convert `s` into a list of bits (msb first) ||
+|| `bits_lsb s` or `s.bits_lsb` || Convert `s` into a list of bits (lsb first) ||
+|| `bits_msb s` or `s.bits_msb` || See `bits` ||
+|| `split s` or `s.split` || Splits s in half returning a pair of signals.  If the width of s is odd the left element of the returned pair will be 1 bit larger. ||
+|| `repeat s n` or `s.repeat n` || Repeats s n times. ||
+|| `msb s` or `s.msb` || Most significant bit of s. ||
+|| `msbs s` or `s.msbs` || Most significant bits of s. ||
+|| `lsb s` or `s.lsb` || Least significant bit of s. ||
+|| `lsbs s` or `s.lsbs` || Least significant bits of s. ||
+|| `se s` or `s.se` || Extends s by 1 bit by repeating the msb. ||
+|| `ue s` or `s.ue` || Extends s by 1 bit by adding a 0. ||
+|| `a ++ b` or `cat a b` || Concatenate two signals ||
+|| concat signal_list || Concatenate a list of signals.  Head of `signal_list` aligns with msb of result. ||
+|| concat_msb signal_list || See concat. ||
+|| concat_lsb signal_list || Same as concat except head of `signal_list` aligns with lsb of result. ||
+
+== Shifting ==
+
+|| *Function* || Description ||
+|| `a <<< b` or `sll a b` || Logical shift left. ||
+|| `shift_left a b` || Logical shift left. ||
+|| `a <<: b` || Logical shift left. ||
+|| `a >>> b` or `srl a b` || Logical shift right. ||
+|| `shift_right_logical a b` || Logical shift right. ||
+|| `a >>: b` || Logical shift right. ||
+|| `sra a b` || Arithmetic shift right. ||
+|| `shift_right_arithmetic a b` || Arithmetic shift right. ||
+|| `a >>+ b` || Arithmetic shift right. ||
+|| `barrel_shift_left a b` || Barrel shift to the left ||
+|| `barrel_shift_right a b` || Barrel shift to the right ||
+
+The functions `<<<`, `>>>`, `sll`, `srl` and `sra` take an integer
+argument to shift by.
+
+`shift_right_logical`, `shift_left` and `shift_right_arithmetic` take a signal argument to shift by.  They are built using a log shift circuit.
+
+The operators `<<:`, `>>:` and `>>+` are overloaded and take an integer or signal to shift by.
+
+The barrel shifters both take a signal argument to shift by.
+
+== Muxing ==
+
+|| *Function* || *Description* ||
+|| `mux2 sel high low` or `sel.mux2(high, low)` || 2 input multiplexer.  `sel` is a 1 bit select signal.  Returns `high` when `sel` is 1, otherwise `low`.  In the `sel.mux2` form either 'high' or 'low' may be an integer.  ||
+|| `mux sel data_list` or `sel.mux data_list` || N input multiplexer.  `sel` must be large enough to index all elements in `data_list`.  If `sel` can index more elements than provided in `data_list` the last element is repeated. ||
+
+== Bitwise logical ==
+
+|| *Function* || *Description* ||
+|| `a &&& b` or `band a b` || Logical and.  Both arguments must be the same width. ||
+|| `a &: b` || Overloaded logical and.  ||
+|| `bor a b`^1^ || Logical or.  Both arguments must be the same width. ||
+|| `a |: b` || Overloaded logical or.  ||
+|| `a ^^^ b` or `bxor a b` || Logical xor.  Both arguments must be the same width. ||
+|| `a ^: b` || Overloaded logical xor.  ||
+|| `~~~ a` or `bnot a` || Logical not. ||
+
+  1 `|||` is the operator version of bor.  It is not placed in the table as it conflicts with the wiki markup syntax.
+
+The overloaded logical operators may take a signal, integer or string as the right hand
+argument.
+
+== Comparison ==
+
+|| *Function* || *Description * ||
+|| `a ==: b` or `eq a b` || Equality. ||
+|| `a /=: b` or `neq a b` || Inequality. ||
+|| `a <: b` or `lsu a b` || Unsigned less than. ||
+|| `a <=: b` or `lsequ a b` || Unsigned less than or equal to. ||
+|| `a >: b` or `gtu a b` || Unsigned greater than. ||
+|| `a >=: b` or `gtequ a b` || Unsigned greater than or equal to. ||
+|| `a <+ b` or `lss a b` || Signed less than.  ||
+|| `a <=+ b` or `lseqs a b` || Signed less than or equal to. ||
+|| `a >+ b` or `gts a b` || Signed greater than. ||
+|| `a >=+ b` or `gteqs a b` || Signed greater than or equal to. ||
+
+All comparison operators are overloaded to take an integer or string as the right hand argument.
+
+In all cases both operands must the same width and the returned result is 1 bit wide.
+
+== Sequential elements ==
+
+|| *Function* || *Description* ||
+|| `reg clock reset reset_value enable data` || Register with asynchronous reset and clock enable.  ||
+|| `data.reg(clock, reset, reset_value, enable)` || See above. ||
+|| `regc enable data` || Same as reg expect uses the predefined HDFS `clock` and `reset` signal and it's reset value is 0.  ||
+|| `data.regc(enable)` || See above. ||
+|| `memory size clock we w data r` || Memory array with synchronous write and asynchronous read.  `we` is the synchronous write enable.  `w` is the write address.  `data` is the write data.  `r` is the read address.  ||
+|| `data.memory(size, clock, we, w, r)` || See above. ||
+
+The type of register built may be controlled by substituting the `empty` signal for the
+reset, reset_value and enable signals.  The follow table describes what happens in each case.
+
+|| *Signal* || *Description* ||
+|| `reset` || If `empty` the register will be described without an asynchronous reset.  This allows FPGA constructs such as SRL16's to be inferred during synthesis. ||
+|| `enable` || If `empty` no clock enable will be used. ||
+|| `reset_value` || If `empty` then the reset value will default to zero. ||
+
+== Instantiation ==
+
+|| *Function* || *Description* ||
+|| `instgio name generics inouts inputs outputs` || Creates an instantiation of an external component or _black box_.  `generics` describes the generic parameters of the component.  `inouts`, `inputs` and `outputs` describe the components ports.  A ports consists of a name and the HDFS signal it is connected to. ||
+|| `inst name inputs outputs` || Short hand for `instgio` when no `generics` or `inout` ports are required. ||
+|| n `==>` s || Shorthand notation for describing ports.  The name `n` is associated with the signal `s`. ||
+
+=== Generics ===
+
+Generics for instantiations are described using a tuple with the following syntax
+
+{{{
+string * GenericSpec * (GenericData option)  
+}}}
+
+The string is the name of the generic.  `GenericSpec` describes the type of the generic and an optional default value.  `GenericData` describes the optional value of the generic when the component is instantiated.
+
+This specification of a generic value follows the VHDL style of specifying generics with a default value on component declarations.
+
+The `GenericSpec` is defined as follows:
+
+{{{
+type GenericSpec = 
+  | Gd_Bit of int option
+  | Gd_Bv of int * int * string option
+  | Gd_Sl of int option
+  | Gd_Slv of int * int * string option
+  | Gd_Int of int option
+  | Gd_Nat of int option
+  | Gd_Pos of int option
+  | Gd_Float of float option
+  | Gd_Time of string option
+  | Gd_String of string option
+  | Gd_Bool of bool option
+}}}
+
+For example, 
+
+{{{
+   Gd_Slv(3,0,Some("1100"))
+}}}
+
+`GenericData` is defined as follows:
+
+{{{
+type GenericData = 
+  | G_Bit of int 
+  | G_Vec of string
+  | G_Int of int 
+  | G_String of string
+  | G_Float of float
+  | G_Bool of bool
+}}}
+
+A complete generic specification would look like this:
+
+{{{
+("the_generic", Gd_Slv(3,0,Some("1100")), Some(G_Vec("0011")))
+}}}
+
+and would lead to the following VHDL code:
+
+{{{
+ component ...
+  generic (
+   the_generic : std_logic_vector(3 downto 0) := "1100";
+   ...
+ begin
+  ...
+
+  the_black_box: black_box  
+    generic map (
+      the_generic => "0011",
+    ...
+}}}
+
+Care must be taken when a black box is instantiated multiple times. The `GenericSpec` on each instantiation should be the same or the default value used may not be the one expected.  Further, not all generic types are valid in both VHDL and Verilog.  In general, when not importing a library such as the supplied Xilinx Unisim binding, generics in this form should probably be used.
+
+{{{
+("the_generic", Gd_Slv(3,0,None), Some(G_Vec("0011")))
+("the_generic", Gd_Int(None), Some(G_Int(3)))
+}}}
+
+== Misc ==
+
+|| *Function* || *Description* ||
+|| `ubits v` || Number of bits required to represent the unsigned integer v ||
+|| `sbits v` || Number of bits required to represent the signed integer v assuming a two's complement representation. ||
+|| `width s` or `s.Width` || Width of the signal `s`. ||
+|| `reduce op signal_list` || Apply the binary operator `op` between each element of `signal_list`.  `signal_list` must contain at least two elements. ||
+|| `s.reduce op` || Convert the signal `s` to a list of bits and perform a reduce operation.   `s` should be at least two bits. ||
+|| `reduce_1 op signal_list` || Like `reduce` expect when `signal_list` has only 1 element it is simply returned. ||
+|| `s.reduce_1 op` || Like `reduce` expect when `s` is 1 bit wide it is simply returned. ||
+|| `wire w` || Creates a dangling wire which may be later assigned to. ||
+|| `w <== s` or `assign w s` || Performs assignment to a dangling wire.  It is an error if the wire is already assigned to.  ||
+|| `s -- n` or `set_name s n` || Names the signal `s` with the string `n`. ||
+|| `tristate d_list` || Creates a tristate node.  `d_list` consists of a list of pairs where each pair contains an `output enable` and the `data` to drive when `output enable` is high.  ||
+|| `input n w` || Creates an input port. ||
+|| `output n s` or `s.output n` || Creates an output port. ||
+|| `inout n w` || Creates an inout port. ||
+
+== Behavioral code ==
+
+Behavioral code allows the description of hardware using _guarded assignments_.  This style is similar to the coding of processes, in VHDL, or always blocks, in Verilog.
+
+Unlike VHDL or Verilog statements in behavioral code are just elements of the abstract 
+syntax tree and may therefore be manipulated programmatically.
+
+Code consists of lists of assignments, if and case statements.  To connect the code into a circuit the `behave` function is used.  Here's short example.
+
+{{{
+  let r = b_regc enable 8 in
+  let w = b_wire0 4 in
+  behave [
+    b_if (c ==: 3) [
+      r $== c + 4;
+    ] [
+      r $== c - 4;
+    ];
+    b_switch (c) [
+      b_case (consti 3 0) [ w $== r.q ];
+      b_case (consti 3 1) [ w $== 1 ];
+      b_case (consti 3 2) [ w $== 3 ];
+    ]
+  ]
+}}}
+
+Assignments in behavioral code can be made to registers or wires and may be freely intermixed.  If no assignment is made to a register during a clock cycle it's previous values is held.  If no assignment is made to a wire then it is driven to a default value specified on construction of the wire (this avoids any possibility of inferring latches).  
+
+The following functions create special nodes (called `BehaveAssignTarget`'s) to which behavioral assignments are made.
+
+|| *Function* || *Description* ||
+|| `b_reg clock reset reset_value enable width` || Behavioral register of the given width. ||
+|| `reset_value.b_reg(clock, reset, enable)` || See above.  Width is taken from the reset_value.  ||
+|| `b_regc enable width` || Behavioral register using the default clock and reset. || 
+|| `b_wire default_value` || Behavioral wire with given default value.  ||
+|| `default_value.b_wire` || See above. ||
+|| `b_wire0 width` || Behavioral wire of given width with default value of 0. ||
+
+The following functions are used within `behave` code blocks to define functionality.
+
+|| *Function* || *Description* ||
+|| `b $== s` || The !BehaveAssignTarget `b` (register or wire) is assigned `s`.  Overloaded so that 's' may be a Signal, integer or string. ||
+|| `b_if (cond) [ on_true ] [ on_false ]` || If the signal cond evaluates to 1 then the _list_ of statements `on_true` are evaluated.  Otherwise the `on_false` statements are evaluated. ||
+|| `b_when (cond) [ on_true ]` || Equivalent to `b_if (cond) [ on_true ] []` ||
+|| `b_unless (cond) [ on_false ]` || Equivalent to `b_if (cond) [] [ on_false ]` ||
+|| `b_switch (cond) case_list ]` || Matches cond to the list of provided cases and evaluates the appropriate branch ||
+|| `b_case (constant_expression) code_list` || A case within a switch statement.  `code_list` is evaluated when the switch statements `cond` matches `constant_expression`.   ||
+|| `b.q` || Behavioral registers and wires cannot be used directly in expressions involving Signals as they are of a different type.  In order to do so the `q` property accesses the underlying signal value.  ||
+
+

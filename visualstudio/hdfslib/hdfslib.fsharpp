@@ -1,0 +1,112 @@
+"General"
+{
+"ProjectIdGuid" = "{9F94936C-903B-426C-A2B3-B2624360B78B}"
+}
+"Configurations"
+{
+    "Debug|Win32"
+    {
+    "ProjectType" = "DLL"
+    "OptLevel" = "Off"
+    "StrongNamingLevel" = "None"
+    "OutputPath" = "..\\..\\bin"
+    "SearchPath" = "-I ..\\..\\bin -r hdfs.dll --no-warn 62"
+    "StrongNameFile" = ""
+    "OutputBase" = "hdfslib"
+    "CustomCommandLine" = ""
+    "CustomCompiler" = ""
+    "DebugCheck" = "TRUE"
+    "CustomCompilationCheck" = "FALSE"
+    "DebugStartMode" = "0"
+    "StartApp" = ""
+    "StartAppPath" = ""
+    "CustomStartupArguments" = ""
+    }
+    "Release|Win32"
+    {
+    "ProjectType" = "DLL"
+    "OptLevel" = "3"
+    "StrongNamingLevel" = "None"
+    "OutputPath" = "..\\..\\bin"
+    "SearchPath" = "-I ..\\..\\bin -r hdfs.dll"
+    "StrongNameFile" = ""
+    "OutputBase" = "hdfslib"
+    "CustomCommandLine" = ""
+    "CustomCompiler" = ""
+    "DebugCheck" = "FALSE"
+    "CustomCompilationCheck" = "FALSE"
+    "DebugStartMode" = "0"
+    "StartApp" = ""
+    "StartAppPath" = ""
+    "CustomStartupArguments" = ""
+    }
+}
+"Files"
+{
+    "..\\..\\lib\\util\\hdutil.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\util\\hdadd.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\util\\hddiv.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\util\\hdmul.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\util\\hdram.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\fixed\\fixed.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\cordic\\cordic_ref.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\cordic\\cordic.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\fft\\fft.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\sort\\sort.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\rac\\rac.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\hdcaml\\hdcaml.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\forms\\waveform.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\forms\\hierform.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+    "..\\..\\lib\\cosim\\cosim.ml"
+    {
+    "ProjRelPath" = "T"
+    }
+}
+"ProjStartupServices"
+{
+}
+"Globals"
+{
+}

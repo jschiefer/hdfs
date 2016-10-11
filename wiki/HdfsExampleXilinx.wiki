@@ -1,0 +1,183 @@
+=Xilinx library=
+
+The Xilinx library provides a binding to all Xilinx primitives as described in the Unisim library. As of ISE 8.2.3 this covers all CPLD and Virtex 1, 2, 4 and 5 parts. There are a couple of limitations, however:
+
+  * It is a sad fact that the syntax used by the simulator and synthesizer for setting configuration values on components was different pre virtex 4. This means that a generic or parameter would be set for simulation while an attribute was used for synthesis. It don't have any work around at the moment - about the only thing I can think to do would be to provide wrappers for these components so that generics are used consistently.
+  * HDFS maps vectors of width 1 to bits. In a few cases the xilinx library uses vectors of width one. I suspect this will work OK for synthesis and verilog, but will cause type checking errors for VHDL simulation. Again wrappers could be written to avoid this, though an alternative would be to distinguish between bits and width 1 vectors in the vhdl/verilog generators, at least for instantiation.
+
+The following example shows what the xilinx primitives look like within the library
+
+{{{
+let g_fdc 
+ generic_init (* generic -  init : bit := '0' *)
+ input_c (* input - c : in std_logic *)
+ input_clr (* input - clr : in std_logic *)
+ input_d (* input - d : in std_logic *)
+=
+ let output_q = wire 1 in
+ check_width "fdc" "c" input_c 1;
+ check_width "fdc" "clr" input_clr 1;
+ check_width "fdc" "d" input_d 1;
+ instg "FDC" [
+  ("INIT", Gd_Bit(Some(0)), generic_init);
+ ] [
+  "C" ==> input_c;
+  "CLR" ==> input_clr;
+  "D" ==> input_d;
+ ] [
+  "Q" ==> output_q;
+ ];
+ (
+  output_q (* output - q : out std_logic *)
+ )
+}}}
+
+Each primitive is provided with three separate definitions. The one above is the main definition and in use requires the specification of all generics, inputs and outputs. These definitions are always prefixed with g_.
+
+The second definition takes a list of generics so that only specific ones can be overridden. These definitions are always prefixed with l_.
+
+{{{
+let l_fdc generics_list 
+ input_c
+ input_clr
+ input_d
+=
+ let generic_init = if generics_list = [] then None else List.try_assoc "INIT" generics_list in
+ g_fdc
+  generic_init  input_c input_clr input_d
+}}}
+
+The final definition takes no generics and the defaults are used. No prefix is required.
+
+{{{
+let fdc 
+ input_c
+ input_clr
+ input_d
+=
+ l_fdc []
+  input_c input_clr input_d
+}}}
+
+The following code shows some examples of how these functions may be used.
+
+{{{
+let q1 = output "q1" (g_fdc (Some(g_bit 1)) clock reset d)
+let q2 = output "q2" (g_fdc None clock reset d)
+let q3 = output "q3" (l_fdc ["INIT", (g_bit 0)] clock reset d)
+let q5 = output "q5" (l_fdc [] clock reset d)
+let q6 = output "q6" (fdc clock reset d)
+}}}
+
+==Xilinx adder example==
+
+The namespace `DigitalLogic.Synthesis.Xilinx` contains some routines to make working with LUT's easier.  The most important function is x_lut which allows you to define a LUT in terms of an expression rather than it's INIT string.
+
+The following example uses x_lut to define a 2 input NAND gate.
+
+{{{
+
+> let a = input "a" 1;;
+val a : Signal
+> let b = input "b" 1;;
+val b : Signal
+> let c = x_lut (~~~ (i0 &&& i1)) [ a; b ];;
+val c : Signal
+}}}
+
+Here `a` and `b` are the LUT inputs.  The expression `(~~~ (i0 &&& i1))` defines the NAND gate.  `i0` and `i1` are special values that represent LUT inputs and which are combined using the following operators - `&&&`, `|||`, `^^^`, `==:`, `/=:`, `~~~`.  LUT expressions may be arbitrarily complex and refer to up to 4 (virtex 1, 2, 4) or 6 (virtex 5) inputs.
+
+This is the code that would be generated for this example.
+
+{{{
+> Verilog.write stdout "test" (Circuit.create [ c.output "c" ]);;
+module test (a, b, c);
+ input a;
+ input b;
+ output c;
+
+ /* forward wire declarations */
+ wire hdfs_149;
+
+ /* logic declarations */
+ LUT2 #(.INIT(4'b0111)) the_hdfs_150 (.I0(a), .I1(b), .O(hdfs_149));
+
+ /* wire connections */
+ assign c = hdfs_149;
+
+endmodule
+}}}
+
+Adders in the are built using LUT's connected togther via the dedicated carry chain logic.  Here's the description from `xilinx_synth.ml` regarding adders in the Xilinx Virtex architecture.
+
+{{{
+  How the adders work:
+
+    sum = a ^^^ b ^^^ c_cin
+    carry = (a &&& b) ||| (a &&& cin) ||| (b &&& cin)
+    So calculate d = a ^^^ b in the lut
+    Feed d, and the previous carry in, into xorcy to get the sum
+    To calculate the carry, using muxcy, set d = b, ci to previous carry in and sel to lut out
+
+    a b c | o | x | m |
+    ------+---+---+---+
+    0 0 0 | 0 | 0 | 0 |
+    0 0 1 | 0 | 1 | 0 |
+    0 1 0 | 1 | 1 | 0 |
+    0 1 1 | 1 | 0 | 1 |
+    1 0 0 | 1 | 1 | 0 |
+    1 0 1 | 1 | 0 | 1 |
+    1 1 0 | 0 | 0 | 1 |
+    1 1 1 | 0 | 1 | 1 |
+    ------+---+---+---+
+    o = lut output
+    x = sum (xorcy output)
+    m = carry (muxcy output)
+}}}
+
+This is the basic circuit to build each bit of the adder 
+
+{{{
+  let add_lut a b cin = 
+    let o = x_lut lut_op [ a; b ]
+    let c = muxcy cin b o
+    let s = xorcy cin o
+    c, s
+}}}
+
+This basically implements a one bit full adder.  They must then be combined to produce an n-bit adder feeding the carry through the calculation.
+
+{{{
+  let res, carry_out = 
+    List.fold_left2 (fun (res, cin) a b ->
+      let c, s = add_lut a b cin
+      s :: res, c
+    ) ([],cin) (List.rev a.bits) (List.rev b.bits)
+}}}
+
+Heres the complete code for a generic N-bit adder:
+
+{{{
+let x_add_carry lut_op cin a b = 
+  Signal.check_same [a;b]
+  let add_lut a b cin = 
+    let o = x_lut lut_op [ a; b ]
+    let c = muxcy cin b o
+    let s = xorcy cin o
+    c, s
+  let res, carry_out = 
+    List.fold_left2 (fun (res, cin) a b ->
+      let c, s = add_lut a b cin
+      s :: res, c
+    ) ([],cin) (List.rev a.bits) (List.rev b.bits)
+  carry_out, Signal.concat res
+
+let x_add a b = snd (x_add_carry (i0 ^^^ i1) gnd a b)
+}}}
+
+The code may reused to generate a subtractor.
+
+{{{
+let x_sub a b = snd (x_add_carry (~~~ (i0 ^^^ i1)) vdd b a)
+}}}
+

@@ -1,0 +1,194 @@
+acc_handle_scope()
+This function returns the handle to the scope of an object. The scope can be either a module, task, function, named parallel block, or named sequential block.
+
+acc_handle_by_name()
+This routine returns the handle to a Verilog-HDL object based on the specified name and scope.
+
+acc_handle_parent()
+This function returns handle for the parent primitive instance or module instance of an object
+
+acc_handle_port()
+This function returns handle for a module port
+
+acc_handle_hiconn()
+This function returns the hierarchically higher net connection to a scalar module port or a bit of a vector port
+
+acc_handle_loconn()
+This function returns the hierarchically lower net connection to a scalar module port or a bit of a vector port.
+
+acc_handle_path()
+This function returns a handle to an inter-module path that represents the connection from an output port to an input port
+
+acc_handle_modpath()
+This function returns handle to the path of a module
+
+acc_handle_datapath()
+This function returns a handle to a datapath for a module instance for the specified edge-sensitive module path
+
+acc_handle_pathin()
+This function returns handle for the first net connected to a module path source
+
+acc_handle_pathout()
+This function returns handle for the first net connected to a module path destination
+
+acc_handle_condition()
+This function returns a handle to the conditional expression for the specified path
+
+acc_handle_tchk()
+This function returns handle for the specified timing check of a module (or cell)
+
+acc_handle_tchkarg1()
+This function returns handle for the net connected to the first argument of a timing check
+
+acc_handle_tchkarg2()
+This function returns handle for the net connected to the second argument of a timing check
+
+acc_handle_simulated_net()
+This function returns the simulated net associated with the collapsed net passed as an argument
+
+acc_handle_terminal()
+This function returns handle for a primitive_terminal
+
+acc_handle_conn()
+This function returns handle to the net connected to a primitive terminal
+
+acc_handle_tfarg()
+This function returns handle for the specified argument of the system task or function associated (through the PLI mechanism) with your C-language routine`
+
+acc_fetch_attribute()
+This function returns the value of a parameter or specparam named as an attribute in your source description
+
+acc_fetch_paramtype()
+This function returns the data type of a parameter as one of three predefined integer constants.
+
+acc_fetch_paramval()
+This function returns the value of a parameter or specparam
+
+acc_fetch_defname()
+This function returns a pointer to the defining name of a module instance or primitive instance
+
+acc_fetch_fullname()
+This function returns a pointer to the full hierarchical name of any named object or module path
+
+acc_fetch_name()
+This function returns a pointer to the instance name of any named object or module path
+
+acc_fetch_delays()
+This function fetches different delay values for different objects
+
+acc_fetch_size()
+This function returns the bit size of a net, register, or port.
+
+acc_fetch_range()
+This function retrieves the most significant bit and least significant bit range values for a vector.
+
+acc_fetch_tfarg()
+This function returns value of the specified argument of the system task or function associated (through the PLI mechanism) with your C-language routine
+
+acc_fetch_direction()
+This function returns the direction of a port or terminal as one of three predefined integer constants.
+
+acc_fetch_index()
+This function returns a zero-based integer index for a port or terminal
+
+acc_fetch_edge()
+This function returns the edge specifier (type) of a path input or output terminal as one of these predefined integer constants.
+
+acc_set_value()
+This function returns a pointer to a character string indicating the logic or strength value of a net, register or variable.
+
+acc_initialize()
+This function initializes the environment for access routines
+
+acc_close()
+This function frees internal memory used by access routines; resets all configuration parameters to default values
+
+acc_configure()
+This function sets parameters that control the operation of various access routines
+
+acc_product_version()
+This function returns a pointer to a character string that indicates what version of a Verilog simulator is linked to the access routines
+
+acc_version()
+This function returns a pointer to a character string that indicates version number of your access routine software
+
+acc_count()
+This function returns an integer count of the number of objects related to a particular reference object
+
+acc_collect()
+This function returns a pointer to an array that contains handles for all objects related to a particular reference object
+
+acc_free()
+This function frees memory allocated by acc_collect
+
+acc_compare_handles()
+This function returns true if the two input handles refer to the same object
+
+acc_object_in_typelist()
+This function determines whether an object fits a type or fulltype or exhibits a property specified in an input array
+
+acc_object_of_type()
+This function determines whether an object fits a specified type or fulltype, or exhibits a specified property
+
+acc_next_cell()
+This function returns the next cell instance within the region that includes the entire hierarchy below a module
+
+acc_next_child()
+This function returns the next child of a module
+
+acc_next_modpath()
+This function returns the next path of a module
+
+acc_next_net()
+This function returns the next net of a module
+
+acc_next_parameter()
+This function returns the next parameter within a module
+
+acc_next_port()
+This function returns the next input, output or inout port of a module in the order specified by the port list
+
+acc_next_portout()
+This function returns the next output or inout port of a module in the order specified by the port list
+
+acc_next_primitive()
+This function returns the next gate, switch or user-defined primitive (UDP) within a module
+
+acc_next_specparam()
+This function returns the next specparam within a module
+
+acc_next_tchk()
+This function returns the next timing check within a module
+
+acc_next_terminal()
+This function returns the next terminal of a gate, switch or user-defined primitive (UDP)
+
+acc_next()
+This function within a scope, returns the next object of each type specified in object_type_array
+
+acc_next_topmod()
+This function returns the next top-level module
+
+acc_next_cell_load()
+This function returns the next load on a net inside a cell
+
+acc_next_load()
+This function returns the next primitive terminal driven by a net
+
+acc_next_driver()
+This function returns the next primitive terminal that drives a net
+
+acc_next_hiconn()
+This function returns the next hierarchically higher net connection to a port of a module
+
+acc_next_loconn()
+This function returns the next hierarchically lower net connection to a port of a module
+
+acc_next_bit()
+This function returns the handles of each bit in an expanded vector port or expanded vector net
+
+acc_next_input()
+This function returns a handle to the next input path terminal of the specified module path or datapath
+
+acc_next_output()
+This function returns a handle to the next output path terminal of the specified module path or datapath 

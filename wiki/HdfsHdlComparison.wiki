@@ -1,0 +1,625 @@
+Listed on this page are various short examples comparing HDFS with
+VHDL and Verilog
+
+= Registers =
+
+== Register with asynchronous reset ==
+
+=== VHDL ===
+
+{{{
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity reg_async_reset is
+  generic (
+    bits : integer := 8
+  );
+  port (
+    clock, reset : in std_logic;
+    d : in std_logic_vector(bits-1 downto 0);
+    q : out std_logic_vector(bits-1 downto 0)
+  );
+end entity;
+
+architecture rtl of reg_async_reset is
+begin
+
+  process (clock, reset) is
+  begin
+    if reset = '1' then
+      q <= (others=>'0');
+    elsif rising_edge(clock) then
+      q <= d;
+    end if;
+  end process;
+
+end architecture;
+}}}
+
+=== Verilog ===
+
+{{{
+module reg_async_reset #(
+  parameter bits = 8
+) (
+  input clock, reset,
+  input [bits-1:0] d,
+  output reg [bits-1:0] q
+);
+
+    always @(posedge clock, posedge reset)
+        if (reset) 
+            q <= 0;
+        else
+            q <= d;
+
+endmodule
+}}}
+
+=== HDFS ===
+
+{{{
+let reg_async_reset clock reset d =
+  reg clock reset empty empty d
+}}}
+
+== Register with synchronous reset ==
+
+=== VHDL ===
+
+{{{
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity reg_sync_clear is
+  generic (
+    bits : integer := 8
+  );
+  port (
+    clock, clear : in std_logic;
+    d : in std_logic_vector(bits-1 downto 0);
+    q : out std_logic_vector(bits-1 downto 0)
+  );
+end entity;
+
+architecture rtl of reg_sync_clear is
+begin
+
+  process (clock) is
+  begin
+    if rising_edge(clock) then
+        if clear = '1' then
+          q <= (others=>'0');
+        else
+          q <= d;
+        end if;
+    end if;
+  end process;
+
+end architecture;
+}}}
+
+=== Verilog ===
+
+{{{
+module reg_sync_clear #(
+  parameter bits = 8
+) (
+  input clock, clear,
+  input [bits-1:0] d,
+  output reg [bits-1:0] q
+);
+
+    always @(posedge clock)
+        if (clear) 
+            q <= 0;
+        else
+            q <= d;
+
+endmodule
+}}}
+
+=== HDFS ===
+
+HDFS does not directly provide a register primitive with a sychronous reset, however, 
+building one is not difficult.
+
+The first example defines the logic in a structural fashion by putting a mutliplexor
+controlled by the clear signal at the input to the register.
+
+{{{
+let reg_sync_clear_1 clock clear d = 
+  mux2 clear (zero (width d)) d |> reg clock empty empty empty
+}}}
+
+The second example using a behavioural coding style which is more similar to the 
+VHDL/verilog examples.
+
+{{{
+let reg_sync_clear_2 clock clear d = 
+  let q = b_reg clock empty empty empty (width d)
+  behave
+    [
+      b_if clear
+        [ q $== 0 ]
+        [ q $== d ]
+    ]
+  q.q
+}}}
+
+== Register with all the bell's and whistles ==
+
+=== VHDL ===
+
+{{{
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity reg_bells_and_whistles is
+  generic (
+    bits : integer := 8
+  );
+  port (
+    clock, reset, clear, enable : in std_logic;
+    d : in std_logic_vector(bits-1 downto 0);
+    q : out std_logic_vector(bits-1 downto 0)
+  );
+end entity;
+
+architecture rtl of reg_bells_and_whistles is
+begin
+
+  process (clock, reset) is
+  begin
+    if reset = '1' then
+      q <= (others=>'0');
+    elsif rising_edge(clock) then
+      if clear = '1' then
+        q <= (others=>'0');
+      elsif enable = '1' then
+        q <= d;
+      end if;
+    end if;
+  end process;
+
+end architecture;
+}}}
+
+=== Verilog ===
+
+{{{
+module reg_bells_and_whistles #(
+  parameter bits = 8
+) (
+  input clock, reset, clear, enable,
+  input [bits-1:0] d,
+  output reg [bits-1:0] q
+);
+
+    always @(posedge clock, posedge reset)
+        if (reset)
+            q <= 0;
+        else if (clear) 
+            q <= 0;
+        else if (enable) 
+            q <= d;
+
+endmodule
+}}}
+
+=== HDFS ===
+
+{{{
+let reg_bells_and_whistles_1 clock reset clear enable d = 
+  mux2 clear (zero (width d)) d |> reg clock reset empty enable
+}}}
+
+or alternatively
+
+{{{
+let reg_bells_and_whistles_2 clock reset clear enable d = 
+  let q = b_reg clock reset empty enable (width d)
+  behave
+    [
+      b_if clear
+        [ q $== 0 ]
+        [ q $== d ]
+    ]
+}}}
+
+= Lookup table =
+
+== Simple 4 input lookup table ===
+
+=== VHDL ===
+
+{{{
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity simple_lut is
+  generic (
+    v0, v1, v2, v3 : integer;
+    bits : integer
+  );
+  port (
+    sel : in std_logic_vector(1 downto 0);
+    q : out std_logic_vector(bits-1 downto 0)
+  );
+end entity;
+
+architecture rtl of simple_lut is
+begin
+    
+    process (sel) is
+    begin
+        case to_integer(unsigned(sel)) is
+        when 0 => q <= std_logic_vector(to_unsigned(v0, bits));
+        when 1 => q <= std_logic_vector(to_unsigned(v1, bits));
+        when 2 => q <= std_logic_vector(to_unsigned(v2, bits));
+        when others => q <= std_logic_vector(to_unsigned(v3, bits));
+        end case;
+    end process;
+
+end architecture;
+}}}
+
+=== Verilog ===
+
+{{{
+module simple_lut #(
+    parameter v0=0, v1=0, v2=0, v3=0,
+    parameter bits = 8
+) (
+    input [1:0] sel,
+    output reg [bits-1:0] q
+);
+
+    always @*
+        case (sel)
+        0: q <= v0;
+        1: q <= v1;
+        2: q <= v2;
+        default: q <= v3;
+        endcase
+    
+endmodule
+}}}
+
+=== HDFS ===
+
+{{{
+let simple_lut bits sel v0 v1 v2 v3 = 
+  [ v0; v1; v2; v3 ] |> List.map (consti bits) |> mux sel
+}}}
+
+== Generic mux ===
+
+=== VHDL ===
+
+{{{
+package generic_lut_package is
+  type int_array_t is array (natural range <>) of integer;
+end package;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.generic_lut_package.all;
+
+entity generic_lut is
+  generic (
+    values : int_array_t
+  );
+  port (
+    sel : in unsigned;
+    q : out unsigned
+  );
+end entity;
+
+architecture rtl of generic_lut is
+begin
+
+    -- careful!  The length of sel is not constrained and  may be larger 
+    -- than the length of the values array which will stop a simulation.
+    q <= to_unsigned( values( to_integer(sel) ), q'length );
+
+end architecture;
+}}}
+
+Usage
+
+{{{
+    signal sel : unsigned(1 downto 0);
+    signal q : unsigned(7 downto 0);
+
+...
+
+    the_lut: entity work.generic_lut (rtl)
+        generic map ( values=>(1, 2, 3, 4) ) 
+        port map (sel=>sel, q=>q);
+}}}
+
+=== Verilog ===
+
+{{{
+module generic_lut(sel, q);
+
+    parameter n = 8;
+    parameter bits = 8;
+    parameter [bits*n-1:0] values = 0;
+
+    wire [bits-1:0] values_a [0:n];
+
+    function integer log2(input [31:0] value);
+    begin
+        for (log2=0; value>0; log2=log2+1)
+            value = value >> 1;
+        log2 = value;
+    end
+    endfunction
+    
+    input [log2(n)-1:0] sel;
+    output [bits-1:0] q;
+    
+    genvar i;
+    generate
+        for (i=0; i<n; i=i+1)
+        begin: genvalues
+            assign values_a[i] = values[(i+1)*bits-1:i*bits];
+        end
+    endgenerate
+    
+    assign q = values_a[sel];
+    
+endmodule
+}}}
+
+Usage
+
+{{{
+module test_generic_lut;
+    wire [1:0] sel;
+    wire [2:0] q;
+    generic_lut #( .n(4), .bits(8), .value({ 8'd1, 8'd2, 8'd3, 8'd4 }) ) the_lut ( sel, q );
+endmodule
+}}}
+
+=== HDFS ===
+
+{{{
+let generic_lut bits sel values = 
+  values |> List.map (consti bits) |> mux sel
+}}}
+
+Usage
+
+{{{
+let test_lut = 
+  let q = generic_lut 8 (input "sel" 2) [ 1; 2; 3; 4 ]
+  Verilog.write stdout "generic_lut" (Circuit.create [ q.output "q" ])
+}}}
+
+Output
+
+{{{
+module generic_lut (sel, q);
+ input [1:0] sel;
+ output [7:0] q;
+
+ /* constants */
+ wire [7:0] hdfs_105 = 8'b00000100;
+ wire [7:0] hdfs_104 = 8'b00000011;
+ wire [7:0] hdfs_103 = 8'b00000010;
+ wire [7:0] hdfs_102 = 8'b00000001;
+
+ /* forward wire declarations */
+ reg [7:0] hdfs_106;
+
+ /* logic declarations */
+ always @*
+  case ( sel )
+  0: hdfs_106 <= hdfs_102;
+  1: hdfs_106 <= hdfs_103;
+  2: hdfs_106 <= hdfs_104;
+  default: hdfs_106 <= hdfs_105;
+  endcase
+
+ /* wire connections */
+ assign q = hdfs_106;
+
+endmodule
+}}}
+
+It's worth noting here that both the VHDL and verilog versions have problems 
+relating the number of values supplied to the size of the selection 
+index.  When the number of values supplied is not a power of two, the output can be
+undefined or result in a simulation error.
+
+The HDFS version does not have this problem as it akways treats the last value as the default.
+
+=Multiplexing=
+
+=== VHDL ===
+
+{{{
+package mux_package is
+  function log2(value: in integer) return integer;
+end package;
+
+package body mux_package is
+  function log2(value: in integer) return integer is
+    variable log2 : integer := 0;
+    variable val : integer := value;
+  begin
+      while (value > 0) loop
+        log2 := log2 + 1;
+        val := val / 2;
+      end loop;
+      return log2;
+  end function;
+end package body;
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.mux_package.all;
+
+entity mux is
+  generic (
+    n : integer := 4;
+    bits : integer := 8
+  );
+  port (
+    sel : in unsigned;
+    d : in std_logic_vector(bits*n-1 downto 0);
+    q : out std_logic_vector(bits-1 downto 0)
+  );
+end entity;
+
+architecture rtl of mux is
+  type slv_array_t is array (0 to n-1) of std_logic_vector(bits-1 downto 0);
+  signal w : slv_array_t;
+begin
+    genwires: for i in 0 to n-1 generate
+      w(i) <= d((i+1)*n-1 downto i*n);
+    end generate;
+    q <= w( to_integer(sel) );
+end architecture;
+}}}
+
+=== Verilog ===
+
+{{{
+module mux (sel, d, q);
+
+  function integer log2(input [31:0] value);
+  begin
+      for (log2=0; value>0; log2=log2+1)
+          value = value >> 1;
+  end
+  endfunction
+  
+  parameter n = 4;
+  parameter logn = log2(n);
+  parameter bits = 8;
+
+  input [log2(n)-1:0] sel;
+  input [bits*n-1:0] d;
+  output [bits-1:0] q;
+
+  wire [bits-1:0] w;
+  
+  genvar i;
+  generate 
+    for (i=0; i<n; i=i+1)
+    begin:genwires
+      assign w[i] = d[(i+1)*bits-1:i*bits];
+    end
+  endgenerate
+
+  assign q = w[sel];
+  
+endmodule
+}}}
+
+=== HDFS ===
+
+Building a generic muliplexing strucure in HDFS is trivial:
+
+{{{
+  mux select [ signal0; signal1; ... ]
+}}}
+
+An interesting and slightely more general version is possible by generating a switch structure.
+
+{{{
+let case_mux sel inputs = 
+  let q = b_wire0 (width (List.hd inputs)) 
+  behave
+    [
+      b_switch sel
+        (List.mapi 
+          (fun i x -> b_case (consti (width sel) i) [ q $== x ]) inputs)
+    ]
+}}}
+
+This creates a case statement where the number of cases may vary depending on the input parameters.  Condider the following example of a 4 input mux where the cases have been declared explicitly;
+
+{{{
+let case_mux_4 sel (i0:Signal) (i1:Signal) (i2:Signal) (i3:Signal) = 
+  let q = b_wire0 (width i0)
+  behave
+    [
+      b_switch sel
+        [
+          b_case (consti 2 0) [ q $== i0 ]
+          b_case (consti 2 1) [ q $== i1 ]
+          b_case (consti 2 2) [ q $== i2 ]
+          b_case (consti 2 3) [ q $== i3 ]
+        ]
+    ]
+  q.q
+}}}
+
+With 4 input values the two versions produce identical results:
+
+{{{
+module mux (sel, i0, i1, i2, i3, q);
+ input [1:0] sel;
+ input [7:0] i0;
+ input [7:0] i1;
+ input [7:0] i2;
+ input [7:0] i3;
+ output [7:0] q;
+
+ /* constants */
+ wire [7:0] hdfs_106 = 8'b00000000;
+
+ /* forward wire declarations */
+ wire [7:0] hdfs_107;
+ reg [7:0] hdfs_112;
+
+ /* logic declarations */
+ always @*
+ begin
+  hdfs_112 <= hdfs_106;
+  case ( sel )
+   2'b00: begin
+    hdfs_112 <= i0;
+   end
+   2'b01: begin
+    hdfs_112 <= i1;
+   end
+   2'b10: begin
+    hdfs_112 <= i2;
+   end
+   2'b11: begin
+    hdfs_112 <= i3;
+   end
+  endcase
+ end
+
+ /* wire connections */
+ assign hdfs_107 = hdfs_112;
+ assign q = hdfs_107;
+
+endmodule
+}}}
+
+This code produces different results than the simple mux declaration given before.  Should the index be outwith the number of actual inputs (for example sel = 3 bits, but only 6 inputs given), then the output will be zero.  This was decided on the line:
+
+{{{
+  let q = b_wire0 (width i0)
+}}}
+
+We could change this so the user can select an arbitrary input be driven out in these cases:
+
+{{{
+let case_mux_with_default_sel default_sel sel inputs = 
+  let q = b_wire (List.nth inputs default_sel) 
+  ...
+}}}

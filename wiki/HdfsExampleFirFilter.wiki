@@ -1,0 +1,88 @@
+=FIR filter (and waveforms)=
+
+A simple FIR filter can be built as follows in HDFS.
+
+{{{
+#light 
+open DigitalLogic
+open Numeric.Ops
+open Signal
+open Util
+open List
+  
+let fir_hw input coeffs = 
+  let mul, _ = 
+    fold_left (fun (taps,prev) cof -> 
+      let tap = regc enable prev 
+      taps @ [ regc enable (tap *+ cof) ], tap
+    ) ([],input) coeffs
+  binary_tree 
+    (fun (d:Signal) -> regc enable d.se) 
+    (fun (x:Signal) (y:Signal) -> regc enable (x.se + y.se)) mul
+}}}
+
+The function builds the filter in two parts. The fold_left function constructs a set of taps which store previous input values for the convolution. At each cycle a new input enters the circuit and the taps shuffle along one place. The taps are then multiplied by the relevant coefficient and the result stored in a register. The function returns a list of the multiplied values.
+
+The binary_tree function generates a pipelined adder tree to calculate the final result. Note how we dont need to worry about the number of coefficients or bit precision of any signals - this in all taken care of automatically due to the way the data is structured (as lists) and by the definition of the operators used.
+
+_Note that while this is a pretty area expensive implementation of an FIR filter it has a throughput of 1 result per cycle and as all internal arithmetic operations are registered will run at a high clock rate._
+
+With a circuit built it must be tested to ensure correctness. In general the best way to approach that is to write a golden reference model (ie a software implementation of the filter) and check it against the hardware version in simulation.
+
+{{{
+let fir_sw coeffs inputs = 
+
+  let fir_ref input taps coeffs = 
+    let taps = lselect (input :: taps) 0 ((length coeffs) - 1)
+    fold_left (fun acc (t,c) -> acc + (t * c)) 0 (combine taps coeffs), taps
+
+  let rec calc i taps = 
+    if i <> Array.length inputs then
+      let a,taps = fir_ref inputs.(i) taps coeffs
+      printf "%x\n" a
+      calc (i+1) taps
+    
+  let taps = map (fun x -> 0) coeffs
+  calc 0 taps
+}}}
+
+This function takes the filter coefficients and input data and prints the filter results to the console.
+
+{{{
+let fir_sim coeffs coeff_bits inputs input_bits = 
+  
+  let outputs = [ output "q" (fir_hw (input "d" input_bits) (map (consti coeff_bits) coeffs)) ]
+  let circuit = Circuit.create outputs
+  let sim = Simulator.create circuit
+  let sim, data = sim.record
+  
+  let enable = sim.port "enable"
+  let d = sim.port "d"
+  let q = sim.port "q"
+
+  sim.reset 
+  enable.i <- 1
+  for i=0 to Array.length inputs - 1 do
+    d.i <- inputs.(i)
+    sim.cycle 
+  for i=0 to 4 do
+    sim.cycle 
+  
+  Waveform.draw2 data Waveform.HexFormat
+}}}
+
+This performs the actual hardware simulation and draws the waveform.
+
+{{{
+let coeffs = [ 1; 11; -20; 14; -5 ]
+let coeff_bits = 6
+let inputs = [| 10; -20; 30; 40 |]
+let input_bits = 7
+  
+do fir_sw coeffs inputs
+do fir_sim coeffs coeff_bits inputs input_bits
+}}}
+
+This code configures the test (bit precision, coefficients and input test data) and runs the reference model and simulation.
+
+[http://hdfs.googlecode.com/svn/wiki/fir_test.jpg]

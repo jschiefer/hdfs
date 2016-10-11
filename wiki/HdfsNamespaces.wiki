@@ -1,0 +1,80 @@
+=Namespaces and modules= 
+
+HDFS application will generally need to open the following modules/namespaces:
+
+{{{
+open DigitalLogic
+open Numeric.Ops
+open Signal
+}}}
+
+When using the simulator it can also be convenient to use:
+
+{{{
+open Simulator
+}}}
+
+==DigitalLogic namespace==
+
+Hardware design, netlisting and simulation.
+
+|| *Module* || *Description* ||
+|| Signal || Signal data type and operations ||
+|| Circuit || Circuit creation, traversal and analysis || 
+|| Elaborate || Elaboration of instantiations from internal or external models (in dll's) ||
+|| Simulator || Simulation of single clock synchronous logic designs ||
+|| Verilog || Verilog netlist generation ||
+|| Vhdl || Vhdl netlist generation ||
+|| Edif || Edif netlist generation ||
+|| Fsharp || F# netlist generation ||
+|| C || C (C++/C#) simulation ||
+|| Resources || Resource reporting ||
+|| Util || Hardware design utility functions ||
+|| Waveform || Waveform viewer ||
+|| Heirform || Tree based hierarchy viewer ||
+
+==DigitalLogic.Numeric namespace==
+
+Operations over vectors using various different representations.
+
+|| *Module* || *Description* ||
+|| Ops || Export operator overloading specification for API. ||
+|| Conversions || Conversions of numbers in different formats - ie Big_int, string, array etc ||
+|| !IntBits || Type using a list of integers (either 0 or 1) to represent bit vectors. ||
+|| !StringBits || Type using a string (each character either 0 or 1) to represent bit vectors. ||
+|| !ArrayBits || Type using a `uint32 array` to represent bit vectors. ||
+
+==DigitalLogic.Circuits namespace==
+
+Utility circuits.
+
+|| *Module* || *Description* ||
+|| Add || Addition circuits ||
+|| Multiply || Multiplier circuits ||
+|| Ram || Random access memory suitable for synthesis ||
+|| Sort || Parallel and sequential sorting circuits ||
+|| Fft || Fast fourier transform ||
+|| Divide || Division circuits ||
+|| Cordic || Cordic rotator ||
+|| Rac || Rom-accumulator ||
+|| Xilinx || Xilinx fpga and cpld primitives ||
+
+==DigitalLogic.Synthesis namespace==
+
+Map hardware design primitives to FPGA technology.
+
+|| *Module* || *Description* ||
+|| Xilinx || Synthesis routines for Xilinx FPGA's ||
+
+==Hdcaml namespace==
+
+API compatibe with HDCaml
+
+|| *Module* || *Description* ||
+|| Design || Logic design primitives ||
+|| Verilog || Verilog netlist generation ||
+|| Vhdl || Vhdl netlist generation ||
+|| Systemc || C model generation ||
+|| Simulate || Circuit simulation.  Note - interface uses 32 bit int arrays rather than 31 bit as in HDCaml ||
+|| Verify || Stub routines ||
+|| Waveform || Stub routines ||

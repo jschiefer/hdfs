@@ -1,0 +1,191 @@
+= Behavioral Code =
+
+When coding in a behavioral style assignments to registers are wires are controlled by if and case statements.  In some cases, especially for complex control logic and statemachines, this style of coding can be much simpler than attempting to design hardware using just structural primitives.
+
+Lets look at a short Verilog example followed by the HDFS translation.  In this statemachine we sit in state 0 until a start signal occurs.  We then cycle though states 1, 2 and 3 doing some imaginary work and then return to state 0.  A ready signal indicates when the circuit is in state 0 and thus capable of accepting the start signal.
+
+*Verilog*
+{{{
+  reg [1:0] state;
+  wire ready;
+
+  assign ready = state == 0; 
+ 
+  always @(posedge clock, posedge reset)
+  begin
+    if (reset) begin
+      state <= 0;
+    end else if (enable) begin
+      case (state)
+      0: begin
+        if (start)
+          state <= 1;
+      end
+      1: begin
+        ... do some work
+        state <= 2;
+      end
+      2: begin
+        ... do some work
+        state <= 3;
+      end
+      3: begin
+        ... do some work
+        state <= 0;
+      end
+      endcase
+    end
+  end
+}}}
+
+*HDFS*
+{{{
+  let state = b_regc enable 2 in
+  let ready = b_wire0 1 in
+  behave [
+    b_switch (state.q) [
+      b_case (consti 2 0) [
+        ready $== 1;
+        b_if (start) [
+          state $== 0;
+        ] [];
+      ];
+      b_case (consti 2 1) [
+        ... do some work
+        state $== 2;
+      ];
+      b_case (consti 2 2) [
+        ... do some work
+        state $== 3;
+      ];
+      b_case (consti 2 3) [
+        ... do some work
+        state $== 0;
+      ];
+    ]
+  ]
+}}}
+
+There are a couple of things to note in this translation
+
+{{{
+    b_switch (state.q) [
+}}}
+
+The `b_switch` construct takes a signal as the condition argument.  However, behavioral registers and wires are _not_ simple signals.  The `.q` property accesses the underlying signal.
+
+{{{
+      b_case (consti 2 0) [
+        ready $== 1;
+        b_if (start) [
+          state $== 0;
+        ] [];
+      ];
+}}}
+
+In the verilog version ready is driven as a combinatorial assignment outwith the main statemachine as it is not easy to describe combinatorial logic within a clocked always block (it is possible if you know the difference between blocking and non-blocking assignment - and trust your synthesizer).  In HDFS the notion of clocked/combinatorial is decided when the behavioral signal is defined.  Therefore it is possible to safely mix clocked and combinatorial logic within the same behave block.
+
+== How signal values update ==
+
+Consider the following code
+
+{{{
+  behave [
+    x $== x.q + 1;
+    x $== x.q + 2;
+  ]
+}}}
+
+In a _normal_ programming language, if x starts out as 3, we might expect the final value to be 6.  Not so for HDFS - the actual value will be 5.  Why?  `$==` assignment in HDFS is equivalent to non-blocking assignment in Verilog.  This means that the value of x is not updated during execution of the behave block.  Only once all statements have been executed is the value updated.  Therefore rather than the values updating like this:
+
+{{{
+x = 3 + 1;
+x = 4 + 2;
+x is now 6
+}}}
+
+rather it updates like this
+
+{{{
+x = 3 + 1;
+x = 3 + 2;
+x is set to 5
+}}}
+
+== Enumerated state machine names ==
+
+HDFS provides a utility type which allows you to create state machines using programmer friendly names.  The following example illutrates this:
+
+{{{
+  let state = StateEnum.make clock reset enable SECount [ "one"; "two"; "three"; "four" ] in
+  let ready = b_wire0 1 in
+  behave [
+    b_switch (state.q) [
+      b_case (state.["one"]) [
+        ready $== 1;
+        b_if (start) [
+          state $== "two";
+        ] [];
+      ];
+      b_case (state.["two"]) [
+        state $== "three";
+      ];
+      b_case (state.["three"]) [
+        state $== "four";
+      ];
+      b_case (state.["four"]) [
+        state $== "one";
+      ];
+    ]
+  ]
+}}}
+
+This statemachine construct can be easily switched between counter based, onehot or gray coded representations.
+
+*Counter*
+{{{
+> let state = StateEnum.make clock reset enable SECount [ "one"; "two"; "three"; "four" ];;
+val state : StateEnum
+> state.["one"];;
+val it : Signal = {su = Signal_const (149,2,"00");}
+> state.["two"];;
+val it : Signal = {su = Signal_const (150,2,"01");}
+> state.["three"];;
+val it : Signal = {su = Signal_const (151,2,"10");}
+> state.["four"];;
+val it : Signal = {su = Signal_const (152,2,"11");}
+}}}
+
+*Onehot*
+{{{
+> let state = StateEnum.make clock reset enable SEOneHot [ "one"; "two"; "three"; "four" ];;
+val state : StateEnum
+> state.["one"];;
+val it : Signal = {su = Signal_const (143,4,"0001");}
+> state.["two"];;
+val it : Signal = {su = Signal_const (144,4,"0010");}
+> state.["three"];;
+val it : Signal = {su = Signal_const (145,4,"0100");}
+> state.["four"];;
+val it : Signal = {su = Signal_const (146,4,"1000");}
+}}}
+
+*Gray coded*
+{{{
+> let state = StateEnum.make clock reset enable SEGray [ "one"; "two"; "three"; "four" ];;
+val state : StateEnum
+> state.["one"];;
+val it : Signal = {su = Signal_const (155,2,"00");}
+> state.["two"];;
+val it : Signal = {su = Signal_const (156,2,"01");}
+> state.["three"];;
+val it : Signal = {su = Signal_const (157,2,"11");}
+> state.["four"];;
+val it : Signal = {su = Signal_const (158,2,"10");}
+}}}
+
+== Current limitations ==
+
+  * The most important limitation by far is that behavioral regs and wires cannot have part selection on the left hand side of an assignment ie `my_reg.[3,0] $== some_expression`.  Work to fix this is underway and it doesn't look _too_ hard to implement.
+  * switch statements do not have a default case.  However, this can be emulated by putting the code for the default case before the switch statement.  This is a common thing to do in normal hdl coding anyway so I dont think it's a big deal.
+  * There is no such thing as a for loop construct.  That said I cant think of an example for which a for loop couldn't be implemented by generating behavioral code anyway.
