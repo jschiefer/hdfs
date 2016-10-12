@@ -20,7 +20,8 @@
 
 namespace DigitalLogic
 
-open List
+open System
+open System.Collections
 open DigitalLogic.Numeric
 open DigitalLogic.Numeric.Ops
 open DigitalLogic.Numeric.Conversions
@@ -111,11 +112,11 @@ module Signal = begin
         | Signal_reg      (a,w,clk,rst,rstval,ena,d) -> [clk;rst;rstval;ena;d]
         | Signal_mem      (a,dw,aw,size,clk,w,we,d,r) -> [clk;w;we;d;r]
         | Signal_behave   (a,w,b,d) -> d
-        | Signal_inst     (a,n,m,g,io,i,o) -> map snd (io@i)
+        | Signal_inst     (a,n,m,g,io,i,o) -> List.map snd (io@i)
 #if INST2
-        | Signal_inst2    (a,n,g,io,i,o) -> map snd (io@i)
+        | Signal_inst2    (a,n,g,io,i,o) -> List.map snd (io@i)
 #endif
-        | Signal_tri      (a,w,d) -> (map fst d) @ (map snd d)
+        | Signal_tri      (a,w,d) -> (List.map fst d) @ (List.map snd d)
 
       /// Returns true if the signal is the empty signal
       member x.IsEmpty = x.signal = Signal_empty
@@ -277,11 +278,11 @@ module Signal = begin
   (* ------------------------------------------------------------------------ *)
 
   (** Internal.  Applys the given function to the width of each signal in the given list *)
-  let check_width(s, fn, str) = iter (fun (s : Signal) -> if not (fn (s.width)) then (failwith str)) s
+  let check_width(s, fn, str) = List.iter (fun (s : Signal) -> if not (fn (s.width)) then (failwith str)) s
   (** Internal.  Checks that the given list of signals all have the same width *)
   let check_same (s : Signal list) = 
-    let tw = (hd s).width in
-    iter (fun (s : Signal) -> 
+    let tw = (List.head s).width in
+    List.iter (fun (s : Signal) -> 
       if (tw <> (s.width)) then (failwith ("Expecting width " ^ string tw ^ " but got width " ^ string (s.width)))
     ) s
   (** Internal.  Checks that the given list of signals are all 1 bit wide *)
@@ -310,7 +311,7 @@ module Signal = begin
     (fun (n:string) ->
       (* ... string should be made uppercase first, as VHDL is not case sensitive *)
       if n.Length >= prefix_len then (
-        if (String.sub n 0 prefix_len) = prefix then failwith ("The prefix " ^ prefix ^ " is reserved");        
+        if (n.Substring(0, prefix_len)) = prefix then failwith ("The prefix " ^ prefix ^ " is reserved");        
       );
       let rec mangle n = 
         let cnt = 
@@ -367,11 +368,11 @@ module Signal = begin
     match l with
     | [] -> []
     | hd :: tl ->
-      hd :: (unique_list (filter ((<>) hd) tl)) 
+      hd :: (unique_list (List.filter ((<>) hd) tl)) 
       
   (** Takes a list of signals and returns a list of where each signal is unique based on it's uid *)
   let unique_signal_list signals = 
-    let map = (fold_left (fun set (signal : Signal) -> Map.add (signal.uid) signal set) Map.empty signals) in
+    let map = (List.fold (fun set (signal : Signal) -> Map.add (signal.uid) signal set) Map.empty signals) in
     let l = Map.fold_right (fun k d l -> d :: l) map [] in
     l
 
@@ -381,7 +382,7 @@ module Signal = begin
   let wire_name (x : Signal) = match x.signal with Signal_wire(_,_,n,_) -> !n | _ -> ""
 
   (** Places the given string between each string in the given list *)
-  let fold_strings inner = fold_left (fun x a -> if x = "" then a else x ^ inner ^ a) "" 
+  let fold_strings inner = List.fold (fun x a -> if x = "" then a else x ^ inner ^ a) "" 
 
   (* ------------------------------------------------------------------------ *)
   (* ------------------------------------------------------------------------ *)
@@ -431,7 +432,7 @@ module Signal = begin
     | 'X' | 'H' -> consths len sval
     | 'b' -> 
       let slen = String.length sval in
-      if slen < len then constb ((String.make (len-slen) '0' ) ^ sval)
+      if slen < len then constb ((String('0', (len-slen))) ^ sval)
       else if slen > len then constb (String.sub sval (slen-len) len)
       else constb sval
     | 'B' ->
@@ -590,20 +591,20 @@ module Signal = begin
 
   (** N-input mux *)
   let mux (s:Signal) (d : Signal list) = 
-    let len = length d in
+    let len = List.length d in
     if (1 <<< (s.width)) < len then failwith ("Mux select not big enough for data: " ^ string (s.width) ^ " bits " ^ string len ^ " for elements");
     check_ok d;
     check_same d;
     match len with
     | 0 -> (failwith "Mux must have at least one input")
-    | 1 -> hd d (* with one data item it is always selected (needed for the generators) *)
+    | 1 -> List.head d (* with one data item it is always selected (needed for the generators) *)
     | _ -> 
       if !constant_propogation && s.IsConst && len < (1 <<< 30) && s.width < 32 then
         (* if the select signal is a constant, and also within the range of an integer, replace the mux with the selected value from the mux data list *)
         let idx = int_of_bin_str (string_of_const s) in
-        if idx < len then List.nth d idx
-        else List.nth d (len-1)
-      else { su = Signal_mux (signal_incr_uid(), (hd d).width, s, d) }
+        if idx < len then List.item idx d
+        else List.item (len-1) d
+      else { su = Signal_mux (signal_incr_uid(), (List.head d).width, s, d) }
 
   (** 2-input mux *)
   let mux2 s hi lo = 
