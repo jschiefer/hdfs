@@ -185,13 +185,10 @@ begin
       member x.ports = (x.inputs @ x.outputs @ x.wires)
 
       (** Find a port given a Uid *)
-      [<OverloadID("sim_port_uid")>]
       member x.port (uid:Uid) = match Map.tryfind uid x.sim_port_map with Some(x) -> x | _ -> failwith ("Could not find port " ^ string uid)
       (** Find a port given a Signal *)
-      [<OverloadID("sim_port_signal")>]
       member x.port (signal:Signal) = x.port signal.uid
       (** Find a port given a string name *)
-      [<OverloadID("sim_port_string")>]
       member x.port (str:string) = try x.port (Map.find str x.sim_name_map) with _ -> failwith ("Could not find port " ^ str)
 
       (** Does the given name represent an input *)
@@ -202,7 +199,6 @@ begin
       member x.is_wire str = try x.find_port str x.sim_wires |> ignore; true with _ -> false
 
       (** Lookup a port given a Signal *)
-      [<OverloadID("sim_item_signal")>]
       member x.Item with get(idx : Signal) = x.port idx
 
     end
@@ -613,32 +609,22 @@ begin
         
         (* access to internal nodes (this is largely provided to access internal memorys if needed) *)
 
-        [<OverloadID("data_node_0")>]
         member x.data_node uid = Map.find uid x.sim_data_map 
-        [<OverloadID("data_node_1")>]
         member x.data_node (signal:Signal) = x.data_node signal.uid
         
-        [<OverloadID("reg_node_0")>]
         member x.reg_node uid = Map.find uid x.sim_reg_map 
-        [<OverloadID("reg_node_1")>]
         member x.reg_node (signal:Signal) = x.reg_node signal.uid
         
-        [<OverloadID("mem_lookup_0")>]
         member x.mem_lookup uid = Map.find uid x.sim_mem_map 
-        [<OverloadID("mem_lookup_1")>]
         member x.mem_lookup (signal:Signal) = x.mem_lookup signal.uid
         
-        [<OverloadID("mem_addr_0")>]
         member x.mem_addr ((uid:Uid),(addr:ArrayBits)) = (x.mem_lookup uid) addr
-        [<OverloadID("mem_addr_1")>]
         member x.mem_addr ((signal:Signal),(addr:ArrayBits)) = x.mem_addr(signal.uid, addr)
 
-        [<OverloadID("mem_addr_2")>]
         member x.mem_addr (uid,(addr:int)) = 
           match (x.sim_circuit.find uid).signal with
           | Signal_mem(a,dw,aw,size,clk,w,we,data,r) -> x.mem_addr (uid, ArrayBits.of_int aw addr)
           | _ -> failwith "Expecting a memory"
-        [<OverloadID("mem_addr_3")>]
         member x.mem_addr ((signal:Signal),(addr:int)) = x.mem_addr(signal.uid, addr)
 
     end

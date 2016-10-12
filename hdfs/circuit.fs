@@ -377,30 +377,22 @@ type Circuit = Circuit of
 
     (* Is the uid or signal in the circuit *)
 
-    [<OverloadID("Circuit_mem_0")>]
     member c.mem uid = Map.mem uid c.Map
-    [<OverloadID("Circuit_mem_1")>]
     member c.mem (s:Signal) = Map.mem s.uid c.Map
 
     (* Get a signal based on it's uid *)
     member c.find uid = Map.find uid c.Map
 
     (* is the signal an input *)
-    [<OverloadID("Circuit_is_input_0")>]
     member c.IsInput uid = Set.mem uid c.InputsSet
-    [<OverloadID("Circuit_is_input_1")>]
     member c.IsInput (s:Signal) = Set.mem s.uid c.InputsSet
 
     (* is the signal an output *)
-    [<OverloadID("Circuit_is_output_0")>]
     member c.IsOutput uid = Set.mem uid c.OutputsSet
-    [<OverloadID("Circuit_is_output_1")>]
     member c.IsOutput (s:Signal) = Set.mem s.uid c.OutputsSet
 
     (* is the signal an inout *)
-    [<OverloadID("Circuit_is_inout_0")>]
     member c.IsInout uid = Set.mem uid c.InoutsSet
-    [<OverloadID("Circuit_is_inout_1")>]
     member c.IsInout (s:Signal) = Set.mem s.uid c.InoutsSet
 
   end

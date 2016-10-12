@@ -55,7 +55,6 @@ type Range = { r_high : int; r_low : int }
     member r.width = r.fix.width
     
     (** Given a pair of ranges, return the range which covers both numbers. *)
-    [<OverloadID("Range_union_0")>]
     static member union ((r0 : Range), (r1 : Range)) = 
       let h = max r0.r_high r1.r_high
       let l = min r0.r_low r1.r_low
@@ -196,11 +195,9 @@ type UFixed =
       u
       
     (** Resizes the vector so that it is as least as big as the given range *)
-    [<OverloadID("UFixed_resize_to_0")>]
     member x.resize_to(range : Range) = x.resize(x.range.union(range))
     
     (** Resizes the vector so that it is as least as big as the given range (in Fix format) *)
-    [<OverloadID("UFixed_resize_to_1")>]
     member x.resize_to(fix : Fix) = x.resize(x.range.union(fix.range))
     
     (** Resizing of vector using the supplied rounding and overflow mode. *)
@@ -237,32 +234,24 @@ type UFixed =
       "[" ^ string x.high ^ ":" ^ string x.low ^ "] (f=" ^ string x.fixedPoint ^ " w=" ^ string x.width ^ ")"
 
     (** fixed point constant from an integer *)
-    [<OverloadID("UFixed_consti_0")>]
     static member consti ((fix : Fix), i) = UFixed.to_UFixed(consti fix.width i, fix.fixedPoint)
     
-    [<OverloadID("UFixed_consti_1")>]
     static member consti ((r : Range), i) = UFixed.consti(r.fix, i)
     
     (** fixed point constant from an integer *)
-    [<OverloadID("UFixed_consti_2")>]
     member x.consti i = UFixed.consti(x.range, i).SetRoundingMode(x.round, x.overflow)
     
     (** fixed point constant from a float.  Rounding optional *)
-    [<OverloadID("UFixed_constf_0")>]
     static member constf' (r, (fix : Fix), i) = UFixed.consti(fix, (UFixed.fixed_of_float' (r, fix.fixedPoint, i)))
     
-    [<OverloadID("UFixed_constf_1")>]
     static member constf' (r, (range : Range), i) = UFixed.constf'(r, range.fix, i)
     
     (** fixed point constant from a float.  Performs rounding *)
-    [<OverloadID("UFixed_constf_2")>]
     static member constf ((fix : Fix), i) = UFixed.constf'(true, fix, i)
     
-    [<OverloadID("UFixed_constf_3")>]
     static member constf ((range : Range), i) = UFixed.constf'(true, range, i)
 
     (** fixed point constant from a float.  Performs rounding *)
-    [<OverloadID("UFixed_constf_4")>]
     member x.constf i = UFixed.constf(x.range, i).SetRoundingMode(x.round, x.overflow)
 
     member x.zero = x.constf 0.0
@@ -276,30 +265,24 @@ type UFixed =
     // ////////////////////////////////////////////////////////
 
     (** Addition.  The two input numbers are converted so that their ranges are compatible then extended by one bit. *)
-    [<OverloadID("UFixed_add_0")>]
     static member (+) ((a : UFixed), (b : UFixed)) = 
       let {r_high=high; r_low=low} = a.range.union(b.range)
       let a, b = a.resize (range (high + 1) low), b.resize (range (high + 1) low)
       UFixed.to_UFixed ((a.signal + b.signal), (-(min a.low b.low)), a.round, a.overflow)
 
     (** Addition with an integer operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("UFixed_add_1")>]
     static member (+) ((a : UFixed), (b : int)) = a + a.consti b
 
     (** Addition with a float operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("UFixed_add_2")>]
     static member (+) ((a : UFixed), (b : float)) = a + a.constf b
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
     
-    [<OverloadID("UFixed_sub_0")>]
     static member sub ((a : int), (b : UFixed)) = b.consti a - b
-    [<OverloadID("UFixed_sub_1")>]
     static member sub ((a : float), (b : UFixed)) = b.constf a - b
 
     (** Subtraction.  The two input numbers are converted so that their ranges are compatible then extended by one bit.  The result therefore cannot overflow *)
-    [<OverloadID("UFixed_sub_2")>]
     static member (-) ((a : UFixed), (b : UFixed)) = 
       let {r_high=high; r_low=low} = a.range.union(b.range)
       let a, b = a.resize (range (high + 1) low), b.resize (range (high + 1) low)
@@ -307,27 +290,22 @@ type UFixed =
       s
     
     (** Subtraction with an integer operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("UFixed_sub_3")>]
     static member (-) ((a : UFixed), (b : int)) = a - a.consti b
 
     (** Subtraction with a float operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("UFixed_sub_4")>]
     static member (-) ((a : UFixed), (b : float)) = a - a.constf b
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
     (** Multiplication. *)
-    [<OverloadID("UFixed_Mul_ufixed_ufixed")>]
     static member ( * ) ((a : UFixed), (b : UFixed)) = 
       UFixed.to_UFixed ((a.signal * b.signal), (a.fixedPoint + b.fixedPoint), a.round, a.overflow)
     
     (** Multiplication with an integer operand on the right.  The integer operand is converted to the same fixed point format as the left operand XXX is this the best way to do things? XXX *)
-    [<OverloadID("UFixed_Mul_ufixed_int")>]
     static member ( * ) ((a : UFixed), (b : int)) = a * a.consti b
 
     (** Multiplication with a float operand on the right.  The float operand is converted to the same fixed point format as the left operand XXX is this the best way to do things? XXX *)
-    [<OverloadID("UFixed_Mul_ufixed_float")>]
     static member ( * ) ((a : UFixed), (b : float)) = a * a.constf b
 
     // ////////////////////////////////////////////////////////
@@ -362,64 +340,44 @@ type UFixed =
       assert (a.high = b.high && a.low = b.low)
       UFixed.to_UFixed (a.signal &&& b.signal, a.fixedPoint, a.round, a.overflow)
 
-    [<OverloadID("UFixed_land_1")>]
     static member band ((a : UFixed), (b : UFixed)) = a &&& b
-    [<OverloadID("UFixed_land_2")>]
     static member band ((a : UFixed), (b : int)) = a &&& a.consti b
-    [<OverloadID("UFixed_land_3")>]
     static member band ((a : UFixed), (b : float)) = a &&& a.constf b
 
-    [<OverloadID("UFixed_land_4")>]
     static member (&~) ((a : UFixed), (b : UFixed)) = UFixed.band(a,b)
-    [<OverloadID("UFixed_land_5")>]
     static member (&~) ((a : UFixed), (b : int)) = UFixed.band(a,b)
-    [<OverloadID("UFixed_land_6")>]
     static member (&~) ((a : UFixed), (b : float)) = UFixed.band(a,b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
     (** Logical or. Both operands must have the same fixed point format *)
-    [<OverloadID("UFixed_bor_0")>]
     static member (|||) ((a : UFixed), (b : UFixed)) = 
       assert (a.high = b.high && a.low = b.low)
       UFixed.to_UFixed (a.signal ||| b.signal, a.fixedPoint, a.round, a.overflow)
 
-    [<OverloadID("UFixed_bor_1")>]
     static member bor ((a : UFixed), (b : UFixed)) = a ||| b
-    [<OverloadID("UFixed_bor_2")>]
     static member bor ((a : UFixed), (b : int)) = a ||| a.consti b
-    [<OverloadID("UFixed_bor_3")>]
     static member bor ((a : UFixed), (b : float)) = a ||| a.constf b
 
-    [<OverloadID("UFixed_bor_4")>]
     static member (|~) ((a : UFixed), (b : UFixed)) = UFixed.bor(a,b)
-    [<OverloadID("UFixed_bor_5")>]
     static member (|~) ((a : UFixed), (b : int)) = UFixed.bor(a,b)
-    [<OverloadID("UFixed_bor_6")>]
     static member (|~) ((a : UFixed), (b : float)) = UFixed.bor(a,b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
-    [<OverloadID("UFixed_bxor_0")>]
     (** Logical xor. Both operands must have the same fixed point format *)
     static member (^^^) ((a : UFixed), (b : UFixed)) = 
       assert (a.high = b.high && a.low = b.low)
       UFixed.to_UFixed (a.signal ^^^ b.signal, a.fixedPoint, a.round, a.overflow)
 
-    [<OverloadID("UFixed_bxor_1")>]
     static member bxor ((a : UFixed), (b : UFixed)) = a ^^^ b
-    [<OverloadID("UFixed_bxor_2")>]
     static member bxor ((a : UFixed), (b : int)) = a ^^^ a.consti b
-    [<OverloadID("UFixed_bxor_3")>]
     static member bxor ((a : UFixed), (b : float)) = a ^^^ a.constf b
 
-    [<OverloadID("UFixed_bxor_4")>]
     static member (^~) ((a : UFixed), (b : UFixed)) = UFixed.bxor(a,b)
-    [<OverloadID("UFixed_bxor_5")>]
     static member (^~) ((a : UFixed), (b : int)) = UFixed.bxor(a,b)
-    [<OverloadID("UFixed_bxor_6")>]
     static member (^~) ((a : UFixed), (b : float)) = UFixed.bxor(a,b)
 
     // ////////////////////////////////////////////////////////
@@ -437,129 +395,85 @@ type UFixed =
     // ////////////////////////////////////////////////////////
 
     (** Equality.  Operands may have different fixed point types *)
-    [<OverloadID("UFixed_eq_0")>]
     static member eq ((a : UFixed), (b : UFixed)) = 
       let r = a.range.union(b.range)
       let a, b = a.resize r, b.resize r
       UFixed.to_UFixed (a.signal ==~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("UFixed_eq_1")>]
     static member eq ((a : UFixed), (b : int)) = a ==~ (a.consti b)
-    [<OverloadID("UFixed_eq_2")>]
     static member eq ((a : UFixed), (b : float)) = a ==~ (a.constf b)
 
-    [<OverloadID("UFixed_eq_3")>]
     static member (==~) ((a : UFixed), (b : UFixed)) = UFixed.eq(a, b)
-    [<OverloadID("UFixed_eq_4")>]
     static member (==~) ((a : UFixed), (b : int)) = UFixed.eq(a, b)
-    [<OverloadID("UFixed_eq_5")>]
     static member (==~) ((a : UFixed), (b : float)) = UFixed.eq(a, b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
     (** Inequality.  Operands may have different fixed point types *)
-    [<OverloadID("UFixed_neq_0")>]
     static member neq ((a : UFixed), (b : UFixed)) = 
       let r = a.range.union(b.range)
       let a, b = a.resize r, b.resize r
       UFixed.to_UFixed (a.signal /=~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("UFixed_neq_1")>]
     static member neq ((a : UFixed), (b : int)) = UFixed.(/=~) (a, (a.consti b))
-    [<OverloadID("UFixed_neq_2")>]
     static member neq ((a : UFixed), (b : float)) = UFixed.(/=~) (a, (a.constf b))
 
-    [<OverloadID("UFixed_neq_3")>]
     static member (/=~) ((a : UFixed), (b : UFixed)) = UFixed.neq(a,b) 
-    [<OverloadID("UFixed_neq_4")>]
     static member (/=~) ((a : UFixed), (b : int)) = UFixed.neq(a,b)
-    [<OverloadID("UFixed_neq_5")>]
     static member (/=~) ((a : UFixed), (b : float)) = UFixed.neq(a,b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
     
     (** Unsigned less than.  The arguments must have the same width. The returned UFixed is 1 bit wide. *)
-    [<OverloadID("UFixed_lsu_0")>]
     static member lsu ((a : UFixed), (b : UFixed)) = 
       let r = a.range.union(b.range)
       let a, b = a.resize r, b.resize r
       UFixed.to_UFixed (a.signal <~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("UFixed_lsu_1")>]
     static member lsu ((a : UFixed), (b : int)) = UFixed.lsu(a, a.consti b)
-    [<OverloadID("UFixed_lsu_2")>]
     static member lsu ((a : UFixed), (b : float)) = UFixed.lsu(a, a.constf b)
-    [<OverloadID("UFixed_lsu_4")>]
     static member lsu ((a : int), (b : UFixed)) = UFixed.lsu(b.consti a, b)
-    [<OverloadID("UFixed_lsu_3")>]
     static member lsu ((a : float), (b : UFixed)) = UFixed.lsu(b.constf a, b)
-    [<OverloadID("UFixed_lsu_5")>]
     static member (<~) ((a : UFixed), (b : UFixed)) = UFixed.lsu(a, b)
-    [<OverloadID("UFixed_lsu_6")>]
     static member (<~) ((a : UFixed), (b : int)) = UFixed.lsu(a, b)
-    [<OverloadID("UFixed_lsu_7")>]
     static member (<~) ((a : UFixed), (b : float)) = UFixed.lsu(a, b)
     
     (** Unsigned greater than.  The arguments must have the same width. The returned UFixed is 1 bit wide. *)
-    [<OverloadID("UFixed_gtu_0")>]
     static member gtu ((a : UFixed), (b : UFixed)) = 
       let r = a.range.union(b.range)
       let a, b = a.resize r, b.resize r
       UFixed.to_UFixed (a.signal >~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("UFixed_gtu_1")>]
     static member gtu ((a : UFixed), (b : int)) = UFixed.gtu(a, a.consti b)
-    [<OverloadID("UFixed_gtu_2")>]
     static member gtu ((a : UFixed), (b : float)) = UFixed.gtu(a, a.constf b)
-    [<OverloadID("UFixed_gtu_4")>]
     static member gtu ((a : int), (b : UFixed)) = UFixed.gtu(b.consti a, b)
-    [<OverloadID("UFixed_gtu_3")>]
     static member gtu ((a : float), (b : UFixed)) = UFixed.gtu(b.constf a, b)
-    [<OverloadID("UFixed_gtu_5")>]
     static member (>~) ((a : UFixed), (b : UFixed)) = UFixed.gtu(a, b)
-    [<OverloadID("UFixed_gtu_6")>]
     static member (>~) ((a : UFixed), (b : int)) = UFixed.gtu(a, b)
-    [<OverloadID("UFixed_gtu_7")>]
     static member (>~) ((a : UFixed), (b : float)) = UFixed.gtu(a, b)
   
     (** Unsigned less than or equal.  The arguments must have the same width. The returned UFixed is 1 bit wide. *)
-    [<OverloadID("UFixed_lsequ_0")>]
     static member lsequ ((a : UFixed), (b : UFixed)) = 
       let r = a.range.union(b.range)
       let a, b = a.resize r, b.resize r
       UFixed.to_UFixed (a.signal <=~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("UFixed_lsequ_1")>]
     static member lsequ ((a : UFixed), (b : int)) = UFixed.lsequ(a, a.consti b)
-    [<OverloadID("UFixed_lsequ_2")>]
     static member lsequ ((a : UFixed), (b : float)) = UFixed.lsequ(a, a.constf b)
-    [<OverloadID("UFixed_lsequ_4")>]
     static member lsequ ((a : int), (b : UFixed)) = UFixed.lsequ(b.consti a, b)
-    [<OverloadID("UFixed_lsequ_3")>]
     static member lsequ ((a : float), (b : UFixed)) = UFixed.lsequ(b.constf a, b)
-    [<OverloadID("UFixed_lsequ_5")>]
     static member (<=~) ((a : UFixed), (b : UFixed)) = UFixed.lsequ(a, b)
-    [<OverloadID("UFixed_lsequ_6")>]
     static member (<=~) ((a : UFixed), (b : int)) = UFixed.lsequ(a, b)
-    [<OverloadID("UFixed_lsequ_7")>]
     static member (<=~) ((a : UFixed), (b : float)) = UFixed.lsequ(a, b)
 
     (** Unsigned greater than or equal.  The arguments must have the same width. The returned UFixed is 1 bit wide. *)
-    [<OverloadID("UFixed_gtequ_0")>]
     static member gtequ ((a : UFixed), (b : UFixed)) = 
       let r = a.range.union(b.range)
       let a, b = a.resize r, b.resize r
       UFixed.to_UFixed (a.signal >=~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("UFixed_gtequ_1")>]
     static member gtequ ((a : UFixed), (b : int)) = UFixed.gtequ(a, a.consti b)
-    [<OverloadID("UFixed_gtequ_2")>]
     static member gtequ ((a : UFixed), (b : float)) = UFixed.gtequ(a, a.constf b)
-    [<OverloadID("UFixed_gtequ_4")>]
     static member gtequ ((a : int), (b : UFixed)) = UFixed.gtequ(b.consti a, b)
-    [<OverloadID("UFixed_gtequ_3")>]
     static member gtequ ((a : float), (b : UFixed)) = UFixed.gtequ(b.constf a, b)
-    [<OverloadID("UFixed_gtequ_5")>]
     static member (>=~) ((a : UFixed), (b : UFixed)) = UFixed.gtequ(a, b)
-    [<OverloadID("UFixed_gtequ_6")>]
     static member (>=~) ((a : UFixed), (b : int)) = UFixed.gtequ(a, b)
-    [<OverloadID("UFixed_gtequ_7")>]
     static member (>=~) ((a : UFixed), (b : float)) = UFixed.gtequ(a, b)
 
     // ////////////////////////////////////////////////////////
@@ -567,42 +481,29 @@ type UFixed =
     // ////////////////////////////////////////////////////////
 
     (** Logical shift left.  Fix point is not moved *)
-    [<OverloadID("UFixed_sll_0")>]
     static member (<<<) ((a : UFixed), (shift : int)) = UFixed.to_UFixed (a.signal <<< shift, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("UFixed_sll_1")>]
     static member sll ((a : UFixed), (shift : int)) = a <<< shift
-    [<OverloadID("UFixed_sll_2")>]
     static member sll ((a : UFixed), (shift : UFixed)) = UFixed.to_UFixed(shift_left a.signal shift.signal, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("UFixed_sll_3")>]
     static member (<<~) ((a : UFixed), (shift : int)) = UFixed.sll(a,shift)
-    [<OverloadID("UFixed_sll_4")>]
     static member (<<~) ((a : UFixed), (shift : UFixed)) = UFixed.sll(a,shift)
 
     (** Logical shift right.  Fix point is not moved *)
-    [<OverloadID("UFixed_srl_0")>]
     static member (>>>) ((a : UFixed), (shift : int)) = UFixed.to_UFixed (a.signal >>> shift, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("UFixed_srl_1")>]
     static member srl ((a : UFixed), (shift : int)) = a >>> shift
-    [<OverloadID("UFixed_srl_2")>]
     static member srl ((a : UFixed), (shift : UFixed)) = UFixed.to_UFixed(shift_right_logical a.signal shift.signal, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("UFixed_srl_3")>]
     static member (>>~) ((a : UFixed), (shift : int)) = UFixed.srl(a,shift)
-    [<OverloadID("UFixed_srl_4")>]
     static member (>>~) ((a : UFixed), (shift : UFixed)) = UFixed.srl(a,shift)
 
     // ////////////////////////////////////////////////////////
     // registers 
     // ////////////////////////////////////////////////////////
     
-    [<OverloadID("UFixed_reg_0")>]
     member d.reg(clock, reset, (reset_val : UFixed), enable) = 
       assert (reset_val.high = d.high && reset_val.low = d.low)
       UFixed.to_UFixed(d.signal.reg(clock, reset, reset_val.signal, enable), d.fixedPoint, d.round, d.overflow)
 
-    [<OverloadID("UFixed_reg_1")>]
     member d.reg(clock, reset, (reset_val : int), enable) = d.reg(clock, reset, UFixed.consti(d.range, reset_val), enable)
     
-    [<OverloadID("UFixed_reg_2")>]
     member d.reg(clock, reset, (reset_val : float), enable) = d.reg(clock, reset, UFixed.constf(d.range, reset_val), enable)
 
     (** Creates a synchronous write, asynchronous read memory array from which standard (FPGA) memories may be built *)
@@ -610,10 +511,8 @@ type UFixed =
 
     member x.wire = UFixed.to_UFixed(Signal.wire x.width, x.fixedPoint, x.round, x.overflow)
     
-    [<OverloadID("UFixed_wire_0")>]
     static member swire (range : Range) = UFixed.consti(range, 0).wire
     
-    [<OverloadID("UFixed_wire_1")>]
     static member swire (fix : Fix) = UFixed.consti(fix, 0).wire
     
     static member (<==) ((a : UFixed), (b : UFixed)) = 
@@ -655,7 +554,6 @@ type UFixed =
       let r,o = rstval.round,rstval.overflow
       UFixed_bassign_tgt(UFixed.to_UFixed(a,f,r,o),UFixed.to_UFixed(b,f,r,o),UFixed.to_UFixed(c,f,r,o),d,e)
       
-    [<OverloadID("UFixed_b_reg_0")>]
     member rstval.b_reg(clock, reset, enable) = 
       assert (rstval.width > 0)
       let f = rstval.fixedPoint
@@ -671,22 +569,16 @@ and UFixedBehaveAssignTarget = UFixed_bassign_tgt of UFixed * UFixed * UFixed * 
   
     member x.q = let (UFixed_bassign_tgt(q,_,_,_,_)) = x in q
 
-    [<OverloadID("UFixed_bassign_0")>]
     member target.assign (expr : UFixed) = 
       let (UFixed_bassign_tgt(a,b,c,d,e)) = target
       B_assign_tgt(a.signal,b.signal,c.signal,d,e) $== expr.signal
-    [<OverloadID("UFIxed_bassign_1")>]
     member target.assign (expr : int) = target $== target.q.consti expr
-    [<OverloadID("UFxied_bassign_2")>]
     member target.assign (expr : float) = target $== target.q.constf expr
 
-    [<OverloadID("UFixed_bassign_3")>]
     static member ($==) ((target : UFixedBehaveAssignTarget), (expr : UFixed)) = target.assign expr
     
-    [<OverloadID("UFixed_bassign_4")>]
     static member ($==) ((target : UFixedBehaveAssignTarget), (expr : int)) = target.assign expr
     
-    [<OverloadID("UFixed_bassign_5")>]
     static member ($==) ((target : UFixedBehaveAssignTarget), (expr : float)) = target.assign expr
     
     member x.set_name name = 
@@ -778,11 +670,9 @@ type SFixed =
       u
       
     (** Resizes the vector so that it is as least as big as the given range *)
-    [<OverloadID("SFixed_resize_to_0")>]
     member x.resize_to(range : Range) = x.resize(x.range.union(range))
     
     (** Resizes the vector so that it is as least as big as the given range (in Fix format) *)
-    [<OverloadID("SFixed_resize_to_1")>]
     member x.resize_to(fix : Fix) = x.resize(x.range.union(fix.range))
 
     (** Resizing of vector using the supplied rounding and overflow mode. *)
@@ -820,32 +710,24 @@ type SFixed =
       "[" ^ string x.high ^ ":" ^ string x.low ^ "] (f=" ^ string x.fixedPoint ^ " w=" ^ string x.width ^ ")"
 
     (** fixed point constant from an integer *)
-    [<OverloadID("SFixed_consti_0")>]
     static member consti ((fix : Fix), i) = SFixed.to_SFixed(consti fix.width i, fix.fixedPoint)
     
-    [<OverloadID("SFixed_consti_1")>]
     static member consti ((r : Range), i) = SFixed.consti(r.fix, i)
     
     (** fixed point constant from an integer *)
-    [<OverloadID("SFixed_consti_2")>]
     member x.consti i = SFixed.consti(x.range, i).SetRoundingMode(x.round, x.overflow)
     
     (** fixed point constant from a float.  Rounding optional *)
-    [<OverloadID("SFixed_constf_0")>]
     static member constf' (r, (fix : Fix), i) = SFixed.consti(fix, (SFixed.fixed_of_float' (r, fix.fixedPoint, i)))
     
-    [<OverloadID("SFixed_constf_1")>]
     static member constf' (r, (range : Range), i) = SFixed.constf'(r, range.fix, i)
     
     (** fixed point constant from a float.  Performs rounding *)
-    [<OverloadID("SFixed_constf_2")>]
     static member constf ((fix : Fix), i) = SFixed.constf'(true, fix, i)
     
-    [<OverloadID("SFixed_constf_3")>]
     static member constf ((range : Range), i) = SFixed.constf'(true, range, i)
 
     (** fixed point constant from a float.  Performs rounding *)
-    [<OverloadID("SFixed_constf_4")>]
     member x.constf i = SFixed.constf(x.range, i).SetRoundingMode(x.round, x.overflow)
 
     member x.zero = x.constf 0.0
@@ -859,30 +741,24 @@ type SFixed =
     // ////////////////////////////////////////////////////////
 
     (** Addition.  The two input numbers are converted so that their ranges are compatible then extended by one bit. *)
-    [<OverloadID("SFixed_add_0")>]
     static member (+) ((a : SFixed), (b : SFixed)) = 
       let {r_high=high; r_low=low} = a.range.union(b.range)
       let a, b = a.resize (range (high + 1) low), b.resize (range (high + 1) low)
       SFixed.to_SFixed ((a.signal + b.signal), (-(min a.low b.low)), a.round, a.overflow)
 
     (** Addition with an integer operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("SFixed_add_1")>]
     static member (+) ((a : SFixed), (b : int)) = a + a.consti b
 
     (** Addition with a float operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("SFixed_add_2")>]
     static member (+) ((a : SFixed), (b : float)) = a + a.constf b
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
     
-    [<OverloadID("SFixed_sub_0")>]
     static member sub ((a : int), (b : SFixed)) = b.consti a - b
-    [<OverloadID("SFixed_sub_1")>]
     static member sub ((a : float), (b : SFixed)) = b.constf a - b
 
     (** Subtraction.  The two input numbers are converted so that their ranges are compatible then extended by one bit.  The result therefore cannot overflow *)
-    [<OverloadID("SFixed_sub_2")>]
     static member (-) ((a : SFixed), (b : SFixed)) = 
       let {r_high=high; r_low=low} = a.range.union(b.range)
       let a, b = a.resize (range (high + 1) low), b.resize (range (high + 1) low)
@@ -890,27 +766,22 @@ type SFixed =
       s
     
     (** Subtraction with an integer operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("SFixed_sub_3")>]
     static member (-) ((a : SFixed), (b : int)) = a - a.consti b
 
     (** Subtraction with a float operand on the right.  The integer operand is converted to the same fixed point format as the left operand *)
-    [<OverloadID("SFixed_sub_4")>]
     static member (-) ((a : SFixed), (b : float)) = a - a.constf b
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
     (** Multiplication. *)
-    [<OverloadID("SFixed_Mul_sfixed_sfixed")>]
     static member ( * ) ((a : SFixed), (b : SFixed)) = 
       SFixed.to_SFixed ((a.signal *+ b.signal), (a.fixedPoint + b.fixedPoint), a.round, a.overflow)
     
     (** Multiplication with an integer operand on the right.  The integer operand is converted to the same fixed point format as the left operand XXX is this the best way to do things? XXX *)
-    [<OverloadID("SFixed_Mul_sfixed_int")>]
     static member ( * ) ((a : SFixed), (b : int)) = a * a.consti b
 
     (** Multiplication with a float operand on the right.  The float operand is converted to the same fixed point format as the left operand XXX is this the best way to do things? XXX *)
-    [<OverloadID("SFixed_Mul_sfixed_float")>]
     static member ( * ) ((a : SFixed), (b : float)) = a * a.constf b
 
     // ////////////////////////////////////////////////////////
@@ -945,64 +816,44 @@ type SFixed =
       assert (a.high = b.high && a.low = b.low)
       SFixed.to_SFixed (a.signal &&& b.signal, a.fixedPoint, a.round, a.overflow)
 
-    [<OverloadID("SFixed_land_1")>]
     static member band ((a : SFixed), (b : SFixed)) = a &&& b
-    [<OverloadID("SFixed_land_2")>]
     static member band ((a : SFixed), (b : int)) = a &&& a.consti b
-    [<OverloadID("SFixed_land_3")>]
     static member band ((a : SFixed), (b : float)) = a &&& a.constf b
 
-    [<OverloadID("SFixed_land_4")>]
     static member (&~) ((a : SFixed), (b : SFixed)) = SFixed.band(a,b)
-    [<OverloadID("SFixed_land_5")>]
     static member (&~) ((a : SFixed), (b : int)) = SFixed.band(a,b)
-    [<OverloadID("SFixed_land_6")>]
     static member (&~) ((a : SFixed), (b : float)) = SFixed.band(a,b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
     (** Logical or. Both operands must have the same fixed point format *)
-    [<OverloadID("SFixed_bor_0")>]
     static member (|||) ((a : SFixed), (b : SFixed)) = 
       assert (a.high = b.high && a.low = b.low)
       SFixed.to_SFixed (a.signal ||| b.signal, a.fixedPoint, a.round, a.overflow)
 
-    [<OverloadID("SFixed_bor_1")>]
     static member bor ((a : SFixed), (b : SFixed)) = a ||| b
-    [<OverloadID("SFixed_bor_2")>]
     static member bor ((a : SFixed), (b : int)) = a ||| a.consti b
-    [<OverloadID("SFixed_bor_3")>]
     static member bor ((a : SFixed), (b : float)) = a ||| a.constf b
 
-    [<OverloadID("SFixed_bor_4")>]
     static member (|~) ((a : SFixed), (b : SFixed)) = SFixed.bor(a,b)
-    [<OverloadID("SFixed_bor_5")>]
     static member (|~) ((a : SFixed), (b : int)) = SFixed.bor(a,b)
-    [<OverloadID("SFixed_bor_6")>]
     static member (|~) ((a : SFixed), (b : float)) = SFixed.bor(a,b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
-    [<OverloadID("SFixed_bxor_0")>]
     (** Logical xor. Both operands must have the same fixed point format *)
     static member (^^^) ((a : SFixed), (b : SFixed)) = 
       assert (a.high = b.high && a.low = b.low)
       SFixed.to_SFixed (a.signal ^^^ b.signal, a.fixedPoint, a.round, a.overflow)
 
-    [<OverloadID("SFixed_bxor_1")>]
     static member bxor ((a : SFixed), (b : SFixed)) = a ^^^ b
-    [<OverloadID("SFixed_bxor_2")>]
     static member bxor ((a : SFixed), (b : int)) = a ^^^ a.consti b
-    [<OverloadID("SFixed_bxor_3")>]
     static member bxor ((a : SFixed), (b : float)) = a ^^^ a.constf b
 
-    [<OverloadID("SFixed_bxor_4")>]
     static member (^~) ((a : SFixed), (b : SFixed)) = SFixed.bxor(a,b)
-    [<OverloadID("SFixed_bxor_5")>]
     static member (^~) ((a : SFixed), (b : int)) = SFixed.bxor(a,b)
-    [<OverloadID("SFixed_bxor_6")>]
     static member (^~) ((a : SFixed), (b : float)) = SFixed.bxor(a,b)
 
     // ////////////////////////////////////////////////////////
@@ -1020,129 +871,85 @@ type SFixed =
     // ////////////////////////////////////////////////////////
 
     (** Equality.  Operands may have different fixed point types *)
-    [<OverloadID("SFixed_eq_0")>]
     static member eq ((a : SFixed), (b : SFixed)) = 
       let r = a.range.union (b.range)
       let a, b = a.resize r, b.resize r
       SFixed.to_SFixed (a.signal ==~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("SFixed_eq_1")>]
     static member eq ((a : SFixed), (b : int)) = a ==~ (a.consti b)
-    [<OverloadID("SFixed_eq_2")>]
     static member eq ((a : SFixed), (b : float)) = a ==~ (a.constf b)
 
-    [<OverloadID("SFixed_eq_3")>]
     static member (==~) ((a : SFixed), (b : SFixed)) = SFixed.eq(a, b)
-    [<OverloadID("SFixed_eq_4")>]
     static member (==~) ((a : SFixed), (b : int)) = SFixed.eq(a, b)
-    [<OverloadID("SFixed_eq_5")>]
     static member (==~) ((a : SFixed), (b : float)) = SFixed.eq(a, b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
     (** Inequality.  Operands may have different fixed point types *)
-    [<OverloadID("SFixed_neq_0")>]
     static member neq ((a : SFixed), (b : SFixed)) = 
       let r = a.range.union (b.range)
       let a, b = a.resize r, b.resize r
       SFixed.to_SFixed (a.signal /=~ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("SFixed_neq_1")>]
     static member neq ((a : SFixed), (b : int)) = SFixed.(/=~) (a, (a.consti b))
-    [<OverloadID("SFixed_neq_2")>]
     static member neq ((a : SFixed), (b : float)) = SFixed.(/=~) (a, (a.constf b))
 
-    [<OverloadID("SFixed_neq_3")>]
     static member (/=~) ((a : SFixed), (b : SFixed)) = SFixed.neq(a,b) 
-    [<OverloadID("SFixed_neq_4")>]
     static member (/=~) ((a : SFixed), (b : int)) = SFixed.neq(a,b)
-    [<OverloadID("SFixed_neq_5")>]
     static member (/=~) ((a : SFixed), (b : float)) = SFixed.neq(a,b)
 
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
 
     (** Signed less than.  The arguments must have the same width. The returned SFixed is 1 bit wide. *)
-    [<OverloadID("SFixed_lss_0")>]
     static member lss ((a : SFixed), (b : SFixed)) =
       let r = a.range.union (b.range)
       let a, b = a.resize r, b.resize r
       SFixed.to_SFixed (a.signal <+ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("SFixed_lss_1")>]
     static member lss ((a : SFixed), (b : int)) = SFixed.lss(a, a.consti b)
-    [<OverloadID("SFixed_lss_2")>]
     static member lss ((a : SFixed), (b : float)) = SFixed.lss(a, a.constf b)
-    [<OverloadID("SFixed_lss_4")>]
     static member lss ((a : int), (b : SFixed)) = SFixed.lss(b.consti a, b)
-    [<OverloadID("SFixed_lss_3")>]
     static member lss ((a : float), (b : SFixed)) = SFixed.lss(b.constf a, b)
-    [<OverloadID("SFixed_lss_5")>]
     static member (<+) ((a : SFixed), (b : SFixed)) = SFixed.lss(a, b)
-    [<OverloadID("SFixed_lss_6")>]
     static member (<+) ((a : SFixed), (b : int)) = SFixed.lss(a, b)
-    [<OverloadID("SFixed_lss_7")>]
     static member (<+) ((a : SFixed), (b : float)) = SFixed.lss(a, b)
     
     (** Signed greater than.  The arguments must have the same width. The returned SFixed is 1 bit wide. *)
-    [<OverloadID("SFixed_gts_0")>]
     static member gts ((a : SFixed), (b : SFixed)) = 
       let r = a.range.union (b.range)
       let a, b = a.resize r, b.resize r
       SFixed.to_SFixed (a.signal >+ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("SFixed_gts_1")>]
     static member gts ((a : SFixed), (b : int)) = SFixed.gts(a, a.consti b)
-    [<OverloadID("SFixed_gts_2")>]
     static member gts ((a : SFixed), (b : float)) = SFixed.gts(a, a.constf b)
-    [<OverloadID("SFixed_gts_4")>]
     static member gts ((a : int), (b : SFixed)) = SFixed.gts(b.consti a, b)
-    [<OverloadID("SFixed_gts_3")>]
     static member gts ((a : float), (b : SFixed)) = SFixed.gts(b.constf a, b)
-    [<OverloadID("SFixed_gts_5")>]
     static member (>+) ((a : SFixed), (b : SFixed)) = SFixed.gts(a, b)
-    [<OverloadID("SFixed_gts_6")>]
     static member (>+) ((a : SFixed), (b : int)) = SFixed.gts(a, b)
-    [<OverloadID("SFixed_gts_7")>]
     static member (>+) ((a : SFixed), (b : float)) = SFixed.gts(a, b)
   
     (** Signed less than or equal.  The arguments must have the same width. The returned SFixed is 1 bit wide. *)
-    [<OverloadID("SFixed_lseqs_0")>]
     static member lseqs ((a : SFixed), (b : SFixed)) = 
       let r = a.range.union (b.range)
       let a, b = a.resize r, b.resize r
       SFixed.to_SFixed (a.signal <=+ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("SFixed_lseqs_1")>]
     static member lseqs ((a : SFixed), (b : int)) = SFixed.lseqs(a, a.consti b)
-    [<OverloadID("SFixed_lseqs_2")>]
     static member lseqs ((a : SFixed), (b : float)) = SFixed.lseqs(a, a.constf b)
-    [<OverloadID("SFixed_lseqs_4")>]
     static member lseqs ((a : int), (b : SFixed)) = SFixed.lseqs(b.consti a, b)
-    [<OverloadID("SFixed_lseqs_3")>]
     static member lseqs ((a : float), (b : SFixed)) = SFixed.lseqs(b.constf a, b)
-    [<OverloadID("SFixed_lseqs_5")>]
     static member (<=+) ((a : SFixed), (b : SFixed)) = SFixed.lseqs(a, b)
-    [<OverloadID("SFixed_lseqs_6")>]
     static member (<=+) ((a : SFixed), (b : int)) = SFixed.lseqs(a, b)
-    [<OverloadID("SFixed_lseqs_7")>]
     static member (<=+) ((a : SFixed), (b : float)) = SFixed.lseqs(a, b)
 
     (** Signed greater than or equal.  The arguments must have the same width. The returned SFixed is 1 bit wide. *)
-    [<OverloadID("SFixed_gteqs_0")>]
     static member gteqs ((a : SFixed), (b : SFixed)) = 
       let r = a.range.union (b.range)
       let a, b = a.resize r, b.resize r
       SFixed.to_SFixed (a.signal >=+ b.signal, 0, a.round, a.overflow) 
-    [<OverloadID("SFixed_gteqs_1")>]
     static member gteqs ((a : SFixed), (b : int)) = SFixed.gteqs(a, a.consti b)
-    [<OverloadID("SFixed_gteqs_2")>]
     static member gteqs ((a : SFixed), (b : float)) = SFixed.gteqs(a, a.constf b)
-    [<OverloadID("SFixed_gteqs_4")>]
     static member gteqs ((a : int), (b : SFixed)) = SFixed.gteqs(b.consti a, b)
-    [<OverloadID("SFixed_gteqs_3")>]
     static member gteqs ((a : float), (b : SFixed)) = SFixed.gteqs(b.constf a, b)
-    [<OverloadID("SFixed_gteqs_5")>]
     static member (>=+) ((a : SFixed), (b : SFixed)) = SFixed.gteqs(a, b)
-    [<OverloadID("SFixed_gteqs_6")>]
     static member (>=+) ((a : SFixed), (b : int)) = SFixed.gteqs(a, b)
-    [<OverloadID("SFixed_gteqs_7")>]
     static member (>=+) ((a : SFixed), (b : float)) = SFixed.gteqs(a, b)
 
     // ////////////////////////////////////////////////////////
@@ -1150,52 +957,35 @@ type SFixed =
     // ////////////////////////////////////////////////////////
 
     (** Logical shift left.  Fix point is not moved *)
-    [<OverloadID("SFixed_sll_0")>]
     static member (<<<) ((a : SFixed), (shift : int)) = SFixed.to_SFixed (a.signal <<< shift, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("SFixed_sll_1")>]
     static member sll ((a : SFixed), (shift : int)) = a <<< shift
-    [<OverloadID("SFixed_sll_2")>]
     static member sll ((a : SFixed), (shift : SFixed)) = SFixed.to_SFixed(a.signal <<~ shift.signal, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("SFixed_sll_3")>]
     static member (<<~) ((a : SFixed), (shift : int)) = SFixed.sll(a,shift)
-    [<OverloadID("SFixed_sll_4")>]
     static member (<<~) ((a : SFixed), (shift : SFixed)) = SFixed.sll(a,shift)
 
     (** Logical shift right.  Fix point is not moved *)
-    [<OverloadID("SFixed_srl_0")>]
     static member (>>>) ((a : SFixed), (shift : int)) = SFixed.to_SFixed (a.signal >>> shift, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("SFixed_srl_1")>]
     static member srl ((a : SFixed), (shift : int)) = a >>> shift
-    [<OverloadID("SFixed_srl_2")>]
     static member srl ((a : SFixed), (shift : SFixed)) = SFixed.to_SFixed(a.signal >>~ shift.signal, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("SFixed_srl_3")>]
     static member (>>~) ((a : SFixed), (shift : int)) = SFixed.srl(a,shift)
-    [<OverloadID("SFixed_srl_4")>]
     static member (>>~) ((a : SFixed), (shift : SFixed)) = SFixed.srl(a,shift)
 
     (** Arithmetic shift right.  Fix point is not moved *)
-    [<OverloadID("SFixed_sra_0")>]
     static member (>>+) ((a : SFixed), (shift : int)) = SFixed.to_SFixed (a.signal >>+ shift, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("SFixed_sra_1")>]
     static member sra ((a : SFixed), (shift : int)) = a >>+ shift 
-    [<OverloadID("SFixed_sra_2")>]
     static member sra ((a : SFixed), (shift : SFixed)) = SFixed.to_SFixed(a.signal >>+ shift.signal, a.fixedPoint, a.round, a.overflow)
-    [<OverloadID("SFixed_sra_3")>]
     static member (>>+) ((a : SFixed), (shift : SFixed)) = SFixed.sra(a,shift)
 
     // ////////////////////////////////////////////////////////
     // registers 
     // ////////////////////////////////////////////////////////
     
-    [<OverloadID("SFixed_reg_0")>]
     member d.reg(clock, reset, (reset_val : SFixed), enable) = 
       assert (reset_val.high = d.high && reset_val.low = d.low)
       SFixed.to_SFixed(d.signal.reg(clock, reset, reset_val.signal, enable), d.fixedPoint, d.round, d.overflow)
 
-    [<OverloadID("SFixed_reg_1")>]
     member d.reg(clock, reset, (reset_val : int), enable) = d.reg(clock, reset, SFixed.consti(d.range, reset_val), enable)
     
-    [<OverloadID("SFixed_reg_2")>]
     member d.reg(clock, reset, (reset_val : float), enable) = d.reg(clock, reset, SFixed.constf(d.range, reset_val), enable)
 
     (** Creates a synchronous write, asynchronous read memory array from which standard (FPGA) memories may be built *)
@@ -1203,10 +993,8 @@ type SFixed =
 
     member x.wire = SFixed.to_SFixed(Signal.wire x.width, x.fixedPoint, x.round, x.overflow)
     
-    [<OverloadID("SFixed_wire_1")>]
     static member swire (range : Range) = SFixed.consti(range, 0).wire
     
-    [<OverloadID("SFixed_wire_2")>]
     static member swire (fix : Fix) = SFixed.consti(fix, 0).wire
     
     static member (<==) ((a : SFixed), (b : SFixed)) = 
@@ -1246,7 +1034,6 @@ type SFixed =
       let r,o = rstval.round,rstval.overflow
       SFixed_bassign_tgt(SFixed.to_SFixed(a,f,r,o),SFixed.to_SFixed(b,f,r,o),SFixed.to_SFixed(c,f,r,o),d,e)
       
-    [<OverloadID("SFixed_b_reg_0")>]
     member rstval.b_reg(clock, reset, enable) = 
       assert (rstval.width > 0)
       let f = rstval.fixedPoint
@@ -1262,22 +1049,16 @@ and SFixedBehaveAssignTarget = SFixed_bassign_tgt of SFixed * SFixed * SFixed * 
   
     member x.q = let (SFixed_bassign_tgt(q,_,_,_,_)) = x in q
 
-    [<OverloadID("SFixed_bassign_0")>]
     member target.assign (expr : SFixed) = 
       let (SFixed_bassign_tgt(a,b,c,d,e)) = target
       B_assign_tgt(a.signal,b.signal,c.signal,d,e) $== expr.signal
-    [<OverloadID("SFixed_bassign_1")>]
     member target.assign (expr : int) = target $== target.q.consti expr
-    [<OverloadID("SFixed_bassign_2")>]
     member target.assign (expr : float) = target $== target.q.constf expr
 
-    [<OverloadID("SFixed_bassign_3")>]
     static member ($==) ((target : SFixedBehaveAssignTarget), (expr : SFixed)) = target.assign expr
     
-    [<OverloadID("SFixed_bassign_4")>]
     static member ($==) ((target : SFixedBehaveAssignTarget), (expr : int)) = target.assign expr
     
-    [<OverloadID("SFixed_bassign_5")>]
     static member ($==) ((target : SFixedBehaveAssignTarget), (expr : float)) = target.assign expr
     
     member x.set_name name = 

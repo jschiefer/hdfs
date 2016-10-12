@@ -1275,43 +1275,32 @@ module Signal = begin
     member s.mux (d : Signal list) = mux s d
 
     (** 2-input mux *)
-    [<OverloadID("Signal_mux2_0")>]
     member s.mux2((hi:Signal), (lo:Signal)) = mux2 s hi lo
     (** 2-input mux.  high argument is an integer *)
-    [<OverloadID("Signal_mux2_1")>]
     member s.mux2((hi:int), (lo:Signal)) = s.mux2(lo.consti hi,lo)
     (** 2-input mux.  low argument is an integer *)
-    [<OverloadID("Signal_mux2_2")>]
     member s.mux2((hi:Signal), (lo:int)) = s.mux2(hi,hi.consti lo)
 
     (** Addition.  Both arguments and the result are the same width *)
-    [<OverloadID("Signal_add_0")>]
     static member (+) ((a : Signal), (b : Signal)) = add a b
     (** Addition.  Right argument is an integer. *)
-    [<OverloadID("Signal_add_1")>]
     static member (+) ((a : Signal), (b : int)) = a + a.consti b
     (** Addition.  Right argument is a string. *)
-    [<OverloadID("Signal_add_2")>]
     static member (+) ((a : Signal), (b : string)) = a + (a.constv b)
 
     (** Subtraction.  Both arguments and the result are the same width *)
-    [<OverloadID("Signal_sub_0")>]
     static member (-) ((a : Signal), (b : Signal)) = sub a b
     (** Subtraction.  Right argument is an integer. *)
-    [<OverloadID("Signal_sub_1")>]
     static member (-) ((a : Signal), (b : int)) = a - a.consti b
     (** Subtraction.  Right argument is a string. *)
-    [<OverloadID("Signal_sub_2")>]
     static member (-) ((a : Signal), (b : string)) = a - a.constv b
 
     (** Negation.  Argument and the result are the same width *)
     static member (~-) (a : Signal) = negate a
 
     (** Unsigned multiplication.  Results width is the sum of the widths of the arguments. *)
-    [<OverloadID("Signal_mulu_0")>]
     static member ( * ) ((a : Signal), (b : Signal)) = mulu a b
     (** Unsigned multiplication.  Right argument is an integer. *)
-    [<OverloadID("Signal_mulu_1")>]
     static member ( * ) ((a : Signal), (b : int)) = 
       assert (b >= 0);
       (* optimise if b=0, b=1 or b is a power of two *)
@@ -1325,187 +1314,138 @@ module Signal = begin
         if bb = b then a ++ (zero log1)
         else a * (consti log b)
     (** Unsigned multiplication.  Right argument is a string. *)
-    [<OverloadID("Signal_mulu_2")>]
     static member ( * ) ((a : Signal), (b : string)) = a * a.constv b
 
     (** Signed multiplication.  Results width is the sum of the widths of the arguments. *)
-    [<OverloadID("Signal_muls_0")>]
     static member ( *+ ) ((a : Signal), (b : Signal)) = muls a b
     (** Signed multiplication.  Right argument is an integer. *)
-    [<OverloadID("Signal_muls_1")>]
     static member ( *+ ) ((a : Signal), (b : int)) = 
       match b with
       | 0 -> zero a.width
       | 1 -> a
       | x -> a *+ (consti (sbits b) b)
     (** Signed multiplication.  Right argument is a string. *)
-    [<OverloadID("Signal_muls_2")>]
     static member ( *+ ) ((a : Signal), (b : string)) = a *+ a.constv b
 
     (** Logical shift left by a constant. *)
     static member (<<<) ((a : Signal), (shift : int)) = sll a shift
     (** Logical shift left by a constant. *)
-    [<OverloadID("Signal_sll_0")>]
     static member (<<~) ((a : Signal), (shift : int)) = a <<< shift
     (** Logical shift left by a variable amount. *)
-    [<OverloadID("Signal_sll_1")>]
     static member (<<~) ((a : Signal), (shift : Signal)) = shift_left a shift
 
     (** Logical shift right by a constant. *)
     static member (>>>) ((a : Signal), (shift : int)) = srl a shift
     (** Logical shift right by a constant. *)
-    [<OverloadID("Signal_srl_0")>]
     static member (>>~) ((a : Signal), (shift : int)) = a >>> shift
     (** Logical shift right by a variable amount. *)
-    [<OverloadID("Signal_srl_1")>]
     static member (>>~) ((a : Signal), (shift : Signal)) = shift_right_logical a shift
 
     (** Arithmetic shift right by a constant. *)
-    [<OverloadID("Signal_sra_0")>]
     static member (>>+) ((a : Signal), (shift : int)) = sra a shift
     (** Arithmetic shift right by a variable amount. *)
-    [<OverloadID("Signal_sra_1")>]
     static member (>>+) ((a : Signal), (shift : Signal)) = shift_right_arithmetic a shift
 
     (** Logical and.  Both arguments and the returned signal have the same width. *)
     static member (&&&) (a, b) = band a b
     (** Logical and.  Both arguments and the returned signal have the same width. *)
-    [<OverloadID("Signal_land_0")>]
     static member (&~) ((a : Signal), (b : Signal)) = a &&& b
     (** Logical and.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_land_1")>]
     static member (&~) ((a : Signal), (b : int)) = a &&& a.consti b
     (** Logical and.  Right hand argument is a string. *)
-    [<OverloadID("Signal_land_2")>]
     static member (&~) ((a : Signal), (b : string)) = a &&& a.constv b
 
     (** Logical or.  Both arguments and the returned signal have the same width. *)
     static member (|||) ((a : Signal), (b : Signal)) = bor a b
     (** Logical or.  Both arguments and the returned signal have the same width. *)
-    [<OverloadID("Signal_bor_0")>]
     static member (|~) ((a : Signal), (b : Signal)) = a ||| b
     (** Logical or.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_bor_1")>]
     static member (|~) ((a : Signal), (b : int)) = a ||| a.consti b
     (** Logical or.  Right hand argument is a string. *)
-    [<OverloadID("Signal_bor_2")>]
     static member (|~) ((a : Signal), (b : string)) = a ||| a.constv b
 
     (** Logical xor.  Both arguments and the returned signal have the same width. *)
     static member (^^^) ((a : Signal), (b : Signal)) = bxor a b
     (** Logical xor.  Both arguments and the returned signal have the same width. *)
-    [<OverloadID("Signal_bxor_0")>]
     static member (^~) ((a : Signal), (b : Signal)) = a ^^^ b
     (** Logical xor.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_bxor_1")>]
     static member (^~) ((a : Signal), (b : int)) = a ^^^ a.consti b
     (** Logical xor.  Right hand argument is a string. *)
-    [<OverloadID("Signal_bxor_2")>]
     static member (^~) ((a : Signal), (b : string)) = a ^^^ a.constv b
 
     (** Logical NOT.  Argument and result have the same width *)
     static member (~~~) a = bnot a
 
     (** Equality.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_eq_0")>]
     static member (==~) ((a : Signal), (b : Signal)) = eq a b
     (** Equality.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_eq_1")>]
     static member (==~) ((a : Signal), (b : int)) = a ==~ a.consti b
     (** Equality.  Right hand argument is a string. *)
-    [<OverloadID("Signal_eq_2")>]
     static member (==~) ((a : Signal), (b : string)) = a ==~ a.constv b
 
     (** Inequality.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_neq_0")>]
     static member (/=~) ((a : Signal), (b : Signal)) = ~~~ (a ==~ b)
     (** Inequality.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_neq_1")>]
     static member (/=~) ((a : Signal), (b : int)) = ~~~ (a ==~ b)
     (** Inequality.  Right hand argument is a string. *)
-    [<OverloadID("Signal_neq_2")>]
     static member (/=~) ((a : Signal), (b : string)) = ~~~ (a ==~ b)
 
     (** Unsigned less than.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_lsu_0")>]
     static member (<~) ((a : Signal), (b : Signal)) = lsu a b
     (** Unsigned less than.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_lsu_1")>]
     static member (<~) ((a : Signal), (b : int)) = a <~ a.consti b
     (** Unsigned less than.  Right hand argument is a string. *)
-    [<OverloadID("Signal_lsu_2")>]
     static member (<~) ((a : Signal), (b : string)) = a <~ a.constv b
     
     (** Unsigned greater than.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_gtu_0")>]
     static member (>~) ((a : Signal), (b : Signal)) = gtu a b
     (** Unsigned greater than.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_gtu_1")>]
     static member (>~) ((a : Signal), (b : int)) = a >~ a.consti b
     (** Unsigned greater than.  Right hand argument is a string. *)
-    [<OverloadID("Signal_gtu_2")>]
     static member (>~) ((a : Signal), (b : string)) = a >~ a.constv b
 
     (** Unsigned less than or equal.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_lsequ_0")>]
     static member (<=~) ((a : Signal), (b : Signal)) = lsequ a b
     (** Unsigned less than or equal.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_lsequ_1")>]
     static member (<=~) ((a : Signal), (b : int)) = a <=~ a.consti b
     (** Unsigned less than or equal.  Right hand argument is a string. *)
-    [<OverloadID("Signal_lsequ_2")>]
     static member (<=~) ((a : Signal), (b : string)) = a <=~ a.constv b
 
     (** Unsigned greater than or equal.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_gtequ_0")>]
     static member (>=~) ((a : Signal), (b : Signal)) = gtequ a b
     (** Unsigned greater than or equal.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_gtequ_1")>]
     static member (>=~) ((a : Signal), (b : int)) = a >=~ a.consti b
     (** Unsigned greater than or equal.  Right hand argument is a string. *)
-    [<OverloadID("Signal_gtequ_2")>]
     static member (>=~) ((a : Signal), (b : string)) = a >=~ a.constv b
 
     (* Signed comparison operators.  For width == 1, cannot select lsbs, so it's dealt with specially with combinatorial expressions *)
 
     (** Signed less than.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_lss_0")>]
     static member (<+) ((a : Signal), (b : Signal)) = lss a b
     (** Signed less than.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_lss_1")>]
     static member (<+) ((a : Signal), (b : int)) = a <+ a.consti b
     (** Signed less than.  Right hand argument is a string. *)
-    [<OverloadID("Signal_lss_2")>]
     static member (<+) ((a : Signal), (b : string)) = a <+ a.constv b
     
     (** Signed greater than.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_gts_0")>]
     static member (>+) ((a : Signal), (b : Signal)) = gts a b
     (** Signed greater than.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_gts_1")>]
     static member (>+) ((a : Signal), (b : int)) = a >+ a.consti b
     (** Signed greater than.  Right hand argument is a string. *)
-    [<OverloadID("Signal_gts_2")>]
     static member (>+) ((a : Signal), (b : string)) = a >+ a.constv b
 
     (** Signed less than or equal.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_lseqs_0")>]
     static member (<=+) ((a : Signal), (b : Signal)) = lseqs a b
     (** Signed less than or equal.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_lseqs_1")>]
     static member (<=+) ((a : Signal), (b : int)) = a <=+ a.consti b
     (** Signed less than or equal.  Right hand argument is a string. *)
-    [<OverloadID("Signal_lseqs_2")>]
     static member (<=+) ((a : Signal), (b : string)) = a <=+ a.constv b
 
     (** Signed greater than or equal.  The arguments must have the same width. The returned signal is 1 bit wide. *)
-    [<OverloadID("Signal_gteqs_0")>]
     static member (>=+) ((a : Signal), (b : Signal)) = gteqs a b
     (** Signed greater than or equal.  Right hand argument is an integer. *)
-    [<OverloadID("Signal_gteqs_1")>]
     static member (>=+) ((a : Signal), (b : int)) = a >=+ a.consti b
     (** Signed greater than or equal.  Right hand argument is a string. *)
-    [<OverloadID("Signal_gteqs_2")>]
     static member (>=+) ((a : Signal), (b : string)) = a >=+ a.constv b
 
     (** Signal naming *)
@@ -1515,10 +1455,8 @@ module Signal = begin
     static member (<==) ((a : Signal), (b : Signal)) = assign a b
 
     (** Creates a register *)
-    [<OverloadID("Signal_reg_0")>]
     member d.reg(clock, reset, (reset_val:Signal), enable) = reg clock reset reset_val enable d
     (** Creates a register where reset value is specified as an integer *)
-    [<OverloadID("Signal_reg_1")>]
     member d.reg(clock, reset, (reset_val:int), enable) = reg clock reset (d.consti reset_val) enable d
     
     (** Creates a register with default clock and reset *)
@@ -1557,17 +1495,14 @@ module Signal = begin
       member x.q = let (B_assign_tgt(q,_,_,_,_)) = x in q
 
       (** Behavioral assignment *)
-      [<OverloadID("Signal_bassign_0")>]
       static member (|==) ((target : BehaveAssignTarget), (expr : Signal)) = 
         check_same [target.q; expr];
         B_assign(target, expr)
 
       (** Behavioral assignment with integer value *)
-      [<OverloadID("Signal_bassign_1")>]
       static member (|==) ((target : BehaveAssignTarget), (expr : int)) = target |== target.q.consti expr
       
       (** Behavioral assignment with sring value *)
-      [<OverloadID("Signal_bassign_2")>]
       static member (|==) ((target : BehaveAssignTarget), (expr : string)) = target |== target.q.constv expr
       
       (** Sets name of behavioral register or wire *)
