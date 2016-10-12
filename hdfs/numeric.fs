@@ -20,6 +20,7 @@
 
 namespace DigitalLogic.Numeric
 
+open System
 open Microsoft.FSharp.Core
 open Microsoft.FSharp.Core.LanguagePrimitives
 open Microsoft.FSharp.Core.Operators
@@ -71,6 +72,7 @@ open Ops
 
 /// Functions for converting between numbers in various formats (ints, big ints, strings etc).
 module Conversions = begin
+    type BigInt = bigint
 
   (** Integer to hex character (0..15) *)
   let int_of_hex_char c = 
@@ -167,9 +169,9 @@ module Conversions = begin
     let len = String.length s in
     match len with
     | 0 -> failwith "Invalid string"
-    | 1 | 2 | 3 -> hex_of_bin ((if sign = Signed then String.make (4-len) s.[0] else String.make (4-len) '0') ^ s)
+    | 1 | 2 | 3 -> hex_of_bin ((if sign = Signed then String(s.[0], (4-len)) else String('0', (4-len))) ^ s)
     | 4 -> hex_of_bin s
-    | _ -> hex_str_of_bin_str sign (String.sub s 0 (len-4)) ^ hex_of_bin (String.sub s (len-4) 4)
+    | _ -> hex_str_of_bin_str sign (s.Substring(0, (len-4))) ^ hex_of_bin (s.Substring((len-4), 4))
 
   (** Converts a big int to a binary string *)
   let bin_str_of_big_int width b = 
@@ -184,7 +186,7 @@ module Conversions = begin
     let rec make_string i = 
       if i = 0 then ""
       else (
-        let q,m = BigInt.DivMod(!b, two) in
+        let q,m = bigint.DivRem(!b, two) in
         b := q;
         (make_string (i-1)) ^ (if m = one then "1" else "0")
       ) in
@@ -192,7 +194,7 @@ module Conversions = begin
 
   (** Converts a decimal number, encoded in a string, to a binary string *)
   let bin_str_of_dec_str width d =
-      bin_str_of_big_int width (BigInt.Parse d)
+      bin_str_of_big_int width (bigint.Parse d)
 
   (** Converts an array of integers to a binary string *)
   let bin_str_of_int_array l (a:int[]) = 
@@ -249,9 +251,9 @@ module Conversions = begin
     done;
     (* get 32 bits from big_int *)
     let get_word b = 
-      let q,m = BigInt.DivMod(!b, pow16) in
+      let q,m = bigint.DivRem(!b, pow16) in
       let lo = uint32 (int m) in
-      let q,m = BigInt.DivMod(q, pow16) in
+      let q,m = bigint.DivRem(q, pow16) in
       let hi = uint32 (int m) in
       b := q;
       lo ||| (hi <<< 16) in
@@ -296,9 +298,9 @@ module Conversions = begin
     let topbit = a.[(l-1) / 32] &&& (1 <<< ((l-1) % 32)) in
     let sign = (sign = Signed) && (topbit <> 0) in
     let b = ref BigInt.Zero in
-    let p32 = BigInt.Pow(BigInt 2, BigInt 32) in
-    let p16 = BigInt.Pow(BigInt 2, BigInt 16) in
-    let p = ref BigInt.One in
+    let p32 = bigint.Pow(bigint 2, 32) in
+    let p16 = bigint.Pow(bigint 2, 16) in
+    let p = ref bigint.One in
     let words = (l + 31) / 32 in
     (* convert int to (positive) big_int *)
     let lsr' a s = int ((uint32 a) >>> s) in
@@ -317,7 +319,7 @@ module Conversions = begin
     done;
     (* make negative if required *)
     if sign then
-      !b - BigInt.Pow(BigInt 2, BigInt l)
+      !b - bigint.Pow(bigint 2, l)
     else
       !b
 end
@@ -408,11 +410,11 @@ module IntBits = begin
   let reduce op s = 
     match List.length s with
     | 0 | 1 -> failwith ("Cant reduce 0 or 1 bits")
-    | _ -> List.fold_left (fun acc x -> op acc x) (List.hd s) (List.tl s)
+    | _ -> List.fold (fun acc x -> op acc x) (List.head s) (List.tail s)
 
   let reduce_1 op s = 
     match List.length s with
-    | 1 -> List.hd s 
+    | 1 -> List.head s 
     | _ -> reduce op s
 
   let sll (a:IntBits) shift = 
@@ -435,11 +437,11 @@ module IntBits = begin
 
   let add (a : IntBits) (b : IntBits) = 
     let fa x y z = (x &&& y) ||| (x &&& z) ||| (y &&& z), x ^^^ y ^^^ z in
-    of_int_bits (fst (List.fold_left2 (fun (res,carry) a b -> let carry, sum = fa a b carry in sum::res, carry) ([],0) a.ibits_lsb b.ibits_lsb))
+    of_int_bits (fst (List.fold2 (fun (res,carry) a b -> let carry, sum = fa a b carry in sum::res, carry) ([],0) a.ibits_lsb b.ibits_lsb))
 
   let sub (a : IntBits) (b : IntBits) = 
     let fs x y z = ((~~~ x) &&& (y ||| z)) ||| (x &&& y &&& z), (x ^^^ y) ^^^ z in
-    of_int_bits (fst (List.fold_left2 (fun (res,carry) a b -> let carry, sum = fs a b carry in sum::res, carry) ([],0) a.ibits_lsb b.ibits_lsb))
+    of_int_bits (fst (List.fold2 (fun (res,carry) a b -> let carry, sum = fs a b carry in sum::res, carry) ([],0) a.ibits_lsb b.ibits_lsb))
 
   let negate (a : IntBits) = sub (zero (width a)) a
 
@@ -462,7 +464,7 @@ module IntBits = begin
   (* ------------------------------------------------------------------------ *)
 
   let mulu (a : IntBits) (b : IntBits) = 
-    let _,r = List.fold_left (fun (i,acc) b -> 
+    let _,r = List.fold (fun (i,acc) b -> 
       let acc = cat gnd acc in
       let a = concat [ gnd ; a ; repeat gnd i ] in
       i+1, add acc (band a (repeat b (width a)))
@@ -471,7 +473,7 @@ module IntBits = begin
     
   let muls (a : IntBits) (b : IntBits) = 
     let last = (width b) - 1 in
-    let _,r = List.fold_left (fun (i,acc) b -> 
+    let _,r = List.fold (fun (i,acc) b -> 
       let acc = cat (msb acc) acc in
       let a = concat [ msb a; a ; repeat gnd i ] in
       i+1, (if i = last then sub else add) acc (band a (repeat b (width a)))
@@ -487,7 +489,7 @@ module IntBits = begin
   let neq (a : IntBits) (b : IntBits) = bnot (eq a b)
 
   let lsu (a : IntBits) (b : IntBits) =
-    let r = List.fold_left2 (fun less a b -> 
+    let r = List.fold2 (fun less a b -> 
       match less with 
       | 0 -> if a < b then 1 else if a > b then -1 else 0
       | _ -> less
@@ -591,7 +593,7 @@ module IntBits = begin
         ti 0 x.ibits
 
       member x.to_string = 
-        List.fold_left 
+        List.fold 
           (fun acc x -> acc ^ (if x = 1 then "1" else if x = 0 then "0" else failwith "Invalid binary value")) 
           "" x.ibits
 
@@ -1162,7 +1164,7 @@ module ArrayBits = begin
       let rec lookup (addr:ArrayBits) =
         let lo_bits = addr.data.[0] &&& mask_block in (* store low bits of address *)
         addr.data.[0] <- addr.data.[0] &&& (~~~mask_block); (* mask out low bits for look up *)
-        match Map.tryfind addr !map with
+        match Map.tryFind addr !map with
         | None -> 
           (* Construct block *)
           let a = Array.create block_array_size (make d_bits) in
@@ -1189,9 +1191,9 @@ module ArrayBits = begin
 
   let f_mux max_addr_bits a_bits (dlist:ArrayBits list) = 
     let num_elem = List.length dlist in
-    let first_element = List.hd dlist in
+    let first_element = List.head dlist in
     let d_bits = first_element.width in
-    let last_element = (List.hd (List.rev dlist)) in
+    let last_element = (List.head (List.rev dlist)) in
     assert (max_addr_bits < 32);
     if a_bits <= max_addr_bits then
       (* build an array *)
@@ -1215,14 +1217,14 @@ module ArrayBits = begin
       let zero = make a_bits in
       let one = make a_bits in
       one.data.[0] <- 1ul;
-      let map,_ = List.fold_left (fun (map,cur_addr) el -> 
+      let map,_ = List.fold (fun (map,cur_addr) el -> 
           let next_addr = make a_bits in
           (f_add next_addr cur_addr one)();
           Map.add cur_addr el map, next_addr
         ) (Map.empty, zero) dlist 
       in
       let lookup (addr:ArrayBits) = 
-        match Map.tryfind addr map with
+        match Map.tryFind addr map with
         | None -> last_element
         | Some(x) -> x
       in
@@ -1297,7 +1299,7 @@ module ArrayBits = begin
   (* ------------------------------------------------------------------------ *)
   (* ------------------------------------------------------------------------ *)
 
-  let rec concat s = List.fold_left (fun acc x -> cat x acc) empty s
+  let rec concat s = List.fold (fun acc x -> cat x acc) empty s
   let concat_msb s = concat s
   let concat_lsb s = concat (List.rev s)
 
@@ -1352,11 +1354,11 @@ module ArrayBits = begin
   let reduce op s = 
     match List.length s with
     | 0 | 1 -> failwith ("Cant reduce 0 or 1 bits")
-    | _ -> List.fold_left (fun acc x -> op acc x) (List.hd s) (List.tl s)
+    | _ -> List.fold (fun acc x -> op acc x) (List.head s) (List.tail s)
 
   let reduce_1 op s = 
     match List.length s with
-    | 1 -> List.hd s 
+    | 1 -> List.head s 
     | _ -> reduce op s
 
   let neq (a : ArrayBits) (b : ArrayBits) = bnot (eq a b)
