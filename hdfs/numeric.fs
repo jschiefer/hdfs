@@ -523,7 +523,7 @@ module IntBits = begin
     else gtequ (cat (bnot (msb a)) (lsbs a)) (cat (bnot (msb b)) (lsbs b))
 
   let rec of_int w b = 
-    if w = 1 then of_int_bits [ if b = 0 then 0 else 1 ]
+    if w = 1 then of_int_bits [ (if b = 0 then 0 else 1) ]
     else cat (of_int (w-1) (b>>>1)) (of_int_bits [ b &&& 1 ])
     
   let rec of_string (s:string) =
@@ -531,8 +531,8 @@ module IntBits = begin
     if w = 0 then empty
     else 
       cat 
-        (of_int_bits [ if s.[0] = '1' then 1 else if s.[0] = '0' then 0 else failwith "Invalid binary string" ]) 
-        (of_string (String.sub s 1 (w-1))) 
+        (of_int_bits [ (if s.[0] = '1' then 1 else if s.[0] = '0' then 0 else failwith "Invalid binary string") ]) 
+        (of_string (s.Substring(1,(w-1)))) 
         
   type IntBits 
     with
