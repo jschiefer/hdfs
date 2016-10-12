@@ -373,7 +373,7 @@ module Signal = begin
   (** Takes a list of signals and returns a list of where each signal is unique based on it's uid *)
   let unique_signal_list signals = 
     let map = (List.fold (fun set (signal : Signal) -> Map.add (signal.uid) signal set) Map.empty signals) in
-    let l = Map.fold_right (fun k d l -> d :: l) map [] in
+    let l = Map.foldBack (fun k d l -> d :: l) map [] in
     l
 
   (** Get the connection for this wire, or empty *)
@@ -422,10 +422,10 @@ module Signal = begin
 
   (** Constant from a string using verilog style constant formatting ie 32'd12 *)
   let constv (s:string) : Signal = 
-    let slen, sval = match String.split [ '\'' ] s with [s0;s1] -> s0,s1 | _ -> failwith ("Invalid verilog style constant: " ^ s) in
+    let slen, sval = match s.Split('\'') with [|s0;s1|] -> s0,s1 | _ -> failwith ("Invalid verilog style constant: " ^ s) in
     let len = int slen in
     let ctrl = sval.[0] in
-    let sval = String.sub sval 1 (String.length sval - 1) in
+    let sval = sval.Substring(1, (String.length sval - 1)) in
     match ctrl with
     | 'd' -> constd len sval
     | 'x' | 'h' -> consthu len sval
@@ -433,12 +433,12 @@ module Signal = begin
     | 'b' -> 
       let slen = String.length sval in
       if slen < len then constb ((String('0', (len-slen))) ^ sval)
-      else if slen > len then constb (String.sub sval (slen-len) len)
+      else if slen > len then constb (sval.Substring((slen-len), len))
       else constb sval
     | 'B' ->
       let slen = String.length sval in
-      if slen < len then constb ((String.make (len-slen) sval.[0]) ^ sval)
-      else if slen > len then constb (String.sub sval (slen-len) len)
+      if slen < len then constb ((String(sval.[0], (len-slen))) ^ sval)
+      else if slen > len then constb (sval.Substring((slen-len), len))
       else constb sval
     | _ -> failwith ("Invalid verilog style constant" ^ s ^ " - bad control character")
 
@@ -576,14 +576,14 @@ module Signal = begin
 
   (** Apply the given operator between each element of the given list. Requires at least two signals. *)
   let reduce op s = 
-    match length s with
+    match List.length s with
     | 0 | 1 -> failwith ("Cant reduce 0 or 1 bits")
-    | _ -> fold_left (fun acc x -> op acc x) (hd s) (tl s)
+    | _ -> List.fold (fun acc x -> op acc x) (List.head s) (List.tail s)
 
   (** Lets the single reduce case pass by just returning the data. *)
   let reduce_1 op s = 
-    match length s with
-    | 1 -> hd s 
+    match List.length s with
+    | 1 -> List.head s 
     | _ -> reduce op s
 
   (* ------------------------------------------------------------------------ *)
@@ -801,7 +801,7 @@ module Signal = begin
       if a = b then failwith ("Combinatorial loop found when assigning to wire " ^ name a) 
       else 
         if not (b.IsSequential) then
-          iter (fun b -> (check_comb a b)) b.dependants
+          List.iter (fun b -> (check_comb a b)) b.dependants
     )
 
   (** Dangling wire assignment *)
@@ -878,11 +878,11 @@ module Signal = begin
 
   (** Create a tristate *)
   let tristate d = 
-    let len = length d in
+    let len = List.length d in
     if len <= 0 then failwith "Tristate must have at least one driver";
-    iter (fun ((oe : Signal),_) -> if (oe.width) <> 1 then failwith "Tristate enable must be one bit") d;
-    check_same (map snd d);
-    { su = Signal_tri(signal_incr_uid(), (snd (hd d)).width, d) }
+    List.iter (fun ((oe : Signal),_) -> if (oe.width) <> 1 then failwith "Tristate enable must be one bit") d;
+    check_same (List.map snd d);
+    { su = Signal_tri(signal_incr_uid(), (snd (List.head d)).width, d) }
       
   (* ------------------------------------------------------------------------ *)
   (* ------------------------------------------------------------------------ *)
@@ -975,17 +975,17 @@ module Signal = begin
     in *)
 
     (* find all assigned wires *)
-    let rec behave_targets targets nodes = fold_left behave_target targets nodes
+    let rec behave_targets targets nodes = List.fold behave_target targets nodes
     and behave_target targets node = 
       match node with
       | B_if(cond, on_true, on_false) -> behave_targets targets (on_true @ on_false)
       | B_switch(cond, cases) -> 
-        iter (fun (x : Signal) -> 
+        List.iter (fun (x : Signal) -> 
           if not x.IsConst then 
             failwith "Case indexes must be constants (no expressions - even if logically constant - allowed)\n";
           if width x <> width cond then
-            failwith "Width of case index must equal width of select condition\n") (map fst cases);
-        behave_targets targets (List.concat (map snd cases))
+            failwith "Width of case index must equal width of select condition\n") (List.map fst cases);
+        behave_targets targets (List.concat (List.map snd cases))
       | B_assign(B_assign_tgt(qtarget,target,def,hi,lo), expr) ->
         match target.signal with
         | Signal_wire(_,_,_,d) when !d = empty -> B_assign_tgt(qtarget,target,def,hi,lo) :: targets
@@ -994,8 +994,8 @@ module Signal = begin
     let targets = unique_list (behave_targets [] code) in     // .... unique, but doesnt account for the index range properly
     
     (* Apply the default assignments *)
-    let default_code = map (fun t -> match t with B_assign_tgt(qtarget,target,def,hi,lo) -> B_assign(B_assign_tgt(qtarget,target,def,hi,lo), def)) targets in
-    let targets = map (fun t -> match t with B_assign_tgt(qtarget,target,def,hi,lo) -> target) targets in
+    let default_code = List.map (fun t -> match t with B_assign_tgt(qtarget,target,def,hi,lo) -> B_assign(B_assign_tgt(qtarget,target,def,hi,lo), def)) targets in
+    let targets = List.map (fun t -> match t with B_assign_tgt(qtarget,target,def,hi,lo) -> target) targets in
     let code = default_code @ code in  
     
     (* split by targets *)
@@ -1004,17 +1004,17 @@ module Signal = begin
       | B_assign(B_assign_tgt(_,x,_,_,_),_) when x = target -> true
       | B_assign(_) -> false
       | _ -> true in
-      map (behave_split target) (filter (match_assign_to_target target) nodes)
+      List.map (behave_split target) (List.filter (match_assign_to_target target) nodes)
     and behave_split target node = 
       match node with
       | B_if(cond, on_true, on_false) -> B_if(cond, behave_split_list target on_true, behave_split_list target on_false)
-      | B_switch(cond, cases) -> B_switch(cond, map (fun (i, cases) -> (i, (behave_split_list target cases))) cases)
+      | B_switch(cond, cases) -> B_switch(cond, List.map (fun (i, cases) -> (i, (behave_split_list target cases))) cases)
       | B_assign(target, expr) -> node
     in
-    let codes = map (fun target -> behave_split_list target code) targets in
+    let codes = List.map (fun target -> behave_split_list target code) targets in
 
     (* return true if cases are complete, false if incomplete. *)      
-    let case_complete cond cases = (1 <<< (width cond)) >= (length cases) in
+    let case_complete cond cases = (1 <<< (width cond)) >= (List.length cases) in
     
     (* remove empty case and if statements, identify assignments which cannot occur.
        return optimised tree and boolean indication of whether a transformation was performed.
@@ -1027,8 +1027,8 @@ module Signal = begin
       | B_switch(_,c) when c = [] -> true
       | _ -> false in
       (* filter empty statements *)
-      let nodes, opt = fold_left (fun (l,b) node -> if is_empty node then (l,true) else (node::l,b)) ([],opt) nodes in
-      let nodes = rev nodes in
+      let nodes, opt = List.fold (fun (l,b) node -> if is_empty node then (l,true) else (node::l,b)) ([],opt) nodes in
+      let nodes = List.rev nodes in
       (* When "something" is followed by an assignment the "something" can never contribute to the final value, so it can be removed *)
       let rec assigns (nl,opt) l = 
         match l with
@@ -1050,14 +1050,14 @@ module Signal = begin
           let is_complete = if aggressive then is_complete else is_assign in  (* is assign looks 1 assign ahead.  it should look more.  Definately need to revisit this optimisation *)
           *)
           let is_complete = is_assign in
-          if is_complete (hd tl) 
+          if is_complete (List.head tl) 
           then assigns (nl,true) tl 
           else assigns (a::nl,opt) tl 
       in
       let nodes, opt = assigns ([],opt) nodes in
-      let nodes = rev nodes in
-      let nodes, opts = List.unzip (map (optimise opt) nodes) in
-      nodes, fold_left (||) opt opts
+      let nodes = List.rev nodes in
+      let nodes, opts = List.unzip (List.map (optimise opt) nodes) in
+      nodes, List.fold (||) opt opts
       
     and optimise opt node = 
       match node with
@@ -1068,11 +1068,11 @@ module Signal = begin
         B_if(cond, on_true, on_false), opt
       | B_switch(cond, cases) -> 
         (* filter empty cases *)
-        let cases, opt = fold_left (fun (cur,opt) case -> match case with _,[] -> (cur,true) | _ -> (case::cur,opt)) ([],opt) cases in
-        let cases = rev cases in
+        let cases, opt = List.fold (fun (cur,opt) case -> match case with _,[] -> (cur,true) | _ -> (case::cur,opt)) ([],opt) cases in
+        let cases = List.rev cases in
         (* recursively optimise *)
         let cases, opts = List.unzip (map (fun (i,case) -> let n,o = optimise_list opt case in (i,n),o) cases) in 
-        B_switch(cond, cases), fold_left (||) opt opts
+        B_switch(cond, cases), List.fold (||) opt opts
       | B_assign(target, expr) -> 
         node, opt
     in
@@ -1088,13 +1088,13 @@ module Signal = begin
     in
     
     (* find remaining dependants for each signal *)
-    let rec dependants_list deps nodes = fold_left dependants deps nodes
+    let rec dependants_list deps nodes = List.fold dependants deps nodes
     and dependants deps node = 
       match node with
       | B_if(cond, on_true, on_false) -> dependants_list (cond::deps) (on_true @ on_false)
       | B_switch(cond, cases) ->
         (*let deps = cond :: ((map fst cases) @ deps) in // this adds the constants to the dependants map which is not really what we want *)
-        dependants_list (cond::deps) (List.concat (map snd cases)) 
+        dependants_list (cond::deps) (List.concat (List.map snd cases)) 
       //| B_assign(target, expr) -> expr::deps
       (* note: if the default assignment is optimised then we lose the fact 
          that the default is also a dependant which breaks the f# generator. 
@@ -1104,7 +1104,7 @@ module Signal = begin
     in
 
     (* now wire up the signals *)
-    iter2 (fun code target ->
+    List.iter2 (fun code target ->
       let code, opt = run_optimiser code in 
       let dependants = unique_signal_list (dependants_list [] code) in
       let behave_signal = { su = Signal_behave(signal_incr_uid(), width target, code, dependants) } in
@@ -1148,10 +1148,10 @@ module Signal = begin
 
   (** Creates an instantiation of a sub module with generics and inouts.  Not supported for simulation. *)
   let instgio name generics inouts inputs outputs = 
-    check_ok (map snd inputs);
-    check_ok (map snd outputs);
+    check_ok (List.map snd inputs);
+    check_ok (List.map snd outputs);
     let inst = { su = Signal_inst(signal_incr_uid(), name, ref "", generics, inouts, inputs, outputs) } in
-    iter (fun (x : string * Signal) -> 
+    List.iter (fun (x : string * Signal) -> 
       if not (snd x).IsWire 
       then failwith "Output signals of instantions must be wires"
       else assign (snd x) inst) (outputs@inouts)
@@ -1541,7 +1541,7 @@ module Signal = begin
         let outputs = List.map (fun (n,w) -> n, wire w) outputs in
         let inouts = List.map (fun (n,w) -> n, wire w) inouts in
         let inst = { su = Signal_inst(signal_incr_uid(), comp_name, ref "", generics, inouts, inputs, outputs) } in
-        iter (fun (x : string * Signal) -> 
+        List.iter (fun (x : string * Signal) -> 
           if not (snd x).IsWire 
           then failwith "Output/inout signals of instantions must be wires"
           else assign (snd x) inst) (outputs@inouts);
