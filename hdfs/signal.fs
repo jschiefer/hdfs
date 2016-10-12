@@ -1558,17 +1558,17 @@ module Signal = begin
 
       (** Behavioral assignment *)
       [<OverloadID("Signal_bassign_0")>]
-      static member ($==) ((target : BehaveAssignTarget), (expr : Signal)) = 
+      static member (|==) ((target : BehaveAssignTarget), (expr : Signal)) = 
         check_same [target.q; expr];
         B_assign(target, expr)
 
       (** Behavioral assignment with integer value *)
       [<OverloadID("Signal_bassign_1")>]
-      static member ($==) ((target : BehaveAssignTarget), (expr : int)) = target $== target.q.consti expr
+      static member (|==) ((target : BehaveAssignTarget), (expr : int)) = target |== target.q.consti expr
       
       (** Behavioral assignment with sring value *)
       [<OverloadID("Signal_bassign_2")>]
-      static member ($==) ((target : BehaveAssignTarget), (expr : string)) = target $== target.q.constv expr
+      static member (|==) ((target : BehaveAssignTarget), (expr : string)) = target |== target.q.constv expr
       
       (** Sets name of behavioral register or wire *)
       member x.set_name name = 

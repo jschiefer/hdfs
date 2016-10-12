@@ -61,7 +61,7 @@ module Ops = begin
   let inline (<=+) (x: ^a) (y: ^b) : ^c = (^a: (static member (<=+) : ^a * ^b -> ^c) (x,y))
   let inline (>=+) (x: ^a) (y: ^b) : ^c = (^a: (static member (>=+) : ^a * ^b -> ^c) (x,y))
 
-  let inline ($==) (x: ^a) (y: ^b) : ^c = (^a: (static member ($==) : ^a * ^b -> ^c) (x,y))
+  let inline (|==) (x: ^a) (y: ^b) : ^c = (^a: (static member (|==) : ^a * ^b -> ^c) (x,y))
   let inline (<==) (x: ^a) (y: ^b) : ^c = (^a: (static member (<==) : ^a * ^b -> ^c) (x,y))
 
   let inline (--) (x: ^a) (y: ^b) : ^c = (^a: (static member (--) : ^a * ^b -> ^c) (x,y))
