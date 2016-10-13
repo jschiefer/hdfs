@@ -158,7 +158,7 @@ let write mode (f:System.IO.TextWriter) name (circuit : Circuit) =
   let mask32 l =
     let md = l % 32 in
     let md = if md = 0 then 32 else md in
-    UInt32.to_int (0xFFFFFFFFul >>> (32-md)) in
+    int (0xFFFFFFFFul >>> (32-md)) in
     
   let mem_at offset = ("mem[" ^ string offset ^ "]") in
     

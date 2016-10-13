@@ -137,13 +137,13 @@ let simDataInt =
         | B_eq -> if !a = !b then 1 else 0
         | B_lt -> if !a < !b then 1 else 0
         | B_cat -> !b ||| (!a <<< wb)); 
-    sel = (fun r a hi lo -> r :=  UInt32.to_int ((UInt32.of_int !a) >>> lo)); 
+    sel = (fun r a hi lo -> r :=  int ((uint32 !a) >>> lo)); 
     eq = (fun a b w -> !a = !b);
     to_hex_str = (fun d bits -> 
         let b4 = (bits + 3) / 4 in
         let rec build v b =
           if b4 = b then ""
-          else (build (UInt32.to_int ((UInt32.of_int v) >>> 4)) (b+1)) ^ (hex_of_int (v &&& 15)) in
+          else (build (int ((uint32 v) >>> 4)) (b+1)) ^ (hex_of_int (v &&& 15)) in
         build !d 0
       );
     of_hex_str = (fun d str w -> 
@@ -182,7 +182,7 @@ let simDataUInt32 =
       for i = 0 to String.length s - 1 do
         data := (!data <<< 1) + (if s.[i] = '1' then 1ul else 0ul)
       done);
-    to_int = (fun a -> UInt32.to_int !a);
+    to_int = (fun a -> int(!a));
     copy = (fun a b w -> a := !b);
     mask = (fun a w -> if w < 32 then a := !a &&& (~~~ (mask <<< w)));
     sign_extend = (fun a w -> a := sign_extend !a w);
@@ -207,7 +207,7 @@ let simDataUInt32 =
         let b4 = (bits + 3) / 4 in
         let rec build v b =
           if b4 = b then ""
-          else (build (v >>> 4) (b+1)) ^ (hex_of_int (UInt32.to_int (v &&& 15ul))) in
+          else (build (v >>> 4) (b+1)) ^ (hex_of_int (int (v &&& 15ul))) in
         build !d 0
       );
     of_hex_str = (fun d str w -> 
@@ -216,7 +216,7 @@ let simDataUInt32 =
         let width = (w+3)/4 in
         d := 0ul;
         for i=0 to width-1 do
-          d := !d ||| (UInt32.of_int ((int_of_hex str.[idx i]) <<< (4*i)));
+          d := !d ||| (uint32 ((int_of_hex str.[idx i]) <<< (4*i)));
         done;
       );
     to_bin_str = (fun d bits ->
@@ -246,7 +246,7 @@ let simDataUInt64 =
       for i = 0 to String.length s - 1 do
         data := (!data <<< 1) + (if s.[i] = '1' then 1UL else 0UL)
       done);
-    to_int = (fun a -> UInt64.to_int !a);
+    to_int = (fun a -> int !a);
     copy = (fun a b w -> a := !b);
     sign_extend = (fun a w -> a := sign_extend !a w);
     mask = (fun a w -> if w < 64 then a := !a &&& (~~~ (mask <<< w)));
@@ -271,7 +271,7 @@ let simDataUInt64 =
         let b4 = (bits + 3) / 4 in
         let rec build v b =
           if b4 = b then ""
-          else (build (v >>> 4) (b+1)) ^ (hex_of_int (UInt64.to_int (v &&& 15UL))) in
+          else (build (v >>> 4) (b+1)) ^ (hex_of_int (int (v &&& 15UL))) in
         build !d 0
       );
     of_hex_str = (fun d str w -> 
@@ -280,7 +280,7 @@ let simDataUInt64 =
         let width = (w+3)/4 in
         d := 0UL;
         for i=0 to width-1 do
-          d := !d ||| (UInt64.of_int ((int_of_hex str.[idx i]) <<< (4*i)));
+          d := !d ||| (uint64 ((int_of_hex str.[idx i]) <<< (4*i)));
         done;
       );
     to_bin_str = (fun d bits ->
@@ -307,10 +307,10 @@ let array_mul words_r sign_a sign_b words_a words_b r a b =
     for i = 0 to words_r - 1 do 
       let ib = ref 0 in
       for ia = i downto 0 do 
-        let tmp = ref ((UInt32.to_uint64 (access_a ia)) * (UInt32.to_uint64 (access_b !ib))) in
+        let tmp = ref ((uint64 (access_a ia)) * (uint64 (access_b !ib))) in
         for ic = i to words_r - 1 do
-          tmp := !tmp + (UInt32.to_uint64 r.[ic]);
-          r.[ic] <- UInt64.to_uint32 (!tmp &&& mask);
+          tmp := !tmp + (uint64 r.[ic]);
+          r.[ic] <- uint32 (!tmp &&& mask);
           tmp := !tmp >>> 32;
         done;
         ib := !ib + 1;
@@ -362,7 +362,7 @@ let simDataArray =
           data.[word] <- data.[word] ||| (1ul <<< bit);
       done);
       
-    to_int = (fun a -> UInt32.to_int a.[0]);
+    to_int = (fun a -> int a.[0]);
     copy = (fun a b w -> 
       let words = (w + 31) / 32 in
       for i = 0 to words - 1 do a.[i] <- b.[i] done);
@@ -380,16 +380,16 @@ let simDataArray =
         let tmp = ref 0UL in
         let mask = 0xFFFFFFFFUL in
         for i=0 to words_a - 1 do
-          tmp := (UInt32.to_uint64 a.[i]) + (UInt32.to_uint64 b.[i]) + !tmp;
-          r.[i] <- UInt64.to_uint32 (!tmp &&& mask);
+          tmp := (uint64 a.[i]) + (uint64 b.[i]) + !tmp;
+          r.[i] <- uint32 (!tmp &&& mask);
           tmp := (!tmp >>> 32) &&& 1UL;
         done;
       | B_sub -> 
         let tmp = ref 0UL in
         let mask = 0xFFFFFFFFUL in
         for i=0 to words_a - 1 do
-          tmp := (UInt32.to_uint64 a.[i]) - (UInt32.to_uint64 b.[i]) - !tmp;
-          r.[i] <- UInt64.to_uint32 (!tmp &&& mask);
+          tmp := (uint64 a.[i]) - (uint64 b.[i]) - !tmp;
+          r.[i] <- uint32 (!tmp &&& mask);
           tmp := (!tmp >>> 32) &&& 1UL;
         done;
       (* multiplication *)
@@ -486,7 +486,7 @@ let simDataArray =
         let b4 = (bits + 3) / 4 in
         let rec build b =
           if b4 = b then ""
-          else (build (b+1)) ^ (hex_of_int (UInt32.to_int ((d.[b/8] >>> (4*(b%8))) &&& 15ul))) in
+          else (build (b+1)) ^ (hex_of_int (int ((d.[b/8] >>> (4*(b%8))) &&& 15ul))) in
         build 0
       );
     of_hex_str = (fun d str w -> 
@@ -498,7 +498,7 @@ let simDataArray =
           let nibs = min 8 (width - (i*8)) in
           d.[i] <- 0ul;
           for j=0 to nibs-1 do
-            d.[i] <- d.[i] ||| (UInt32.of_int ((int_of_hex str.[idx ((i*8)+j)]) <<< (4*j)));
+            d.[i] <- d.[i] ||| (uint32 ((int_of_hex str.[idx ((i*8)+j)]) <<< (4*j)));
           done;
         done
       );

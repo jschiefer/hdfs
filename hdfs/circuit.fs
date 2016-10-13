@@ -235,7 +235,7 @@ let connected_nodes_map outputs =
     else
       let set = Set.add (signal.uid) set in
       let add from_uid to_uid map = 
-        match Map.tryfind from_uid map with
+        match Map.tryFind from_uid map with
         | Some(to_uid_set) -> Map.add from_uid (Set.add to_uid to_uid_set) map
         | None -> Map.add from_uid (Set.singleton to_uid) map
       in
@@ -369,17 +369,17 @@ type Circuit = Circuit of
         sort (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) inouts,
         sort (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) wires,
         regs,mems,nodes,consts,inst,inst2,
-        Set.of_list (List.map uid inputs),
-        Set.of_list (List.map uid outputs),
-        Set.of_list (List.map uid inouts),
+        Set.ofList (List.map uid inputs),
+        Set.ofList (List.map uid outputs),
+        Set.ofList (List.map uid inouts),
         all_map,
         connected_nodes_map (outputs @ inouts),
         max_bit_width)
 
     (* Is the uid or signal in the circuit *)
 
-    member c.mem uid = Map.mem uid c.Map
-    member c.mem (s:Signal) = Map.mem s.uid c.Map
+    member c.mem uid = Map.containsKey uid c.Map
+    member c.mem (s:Signal) = Map.containsKey s.uid c.Map
 
     (* Get a signal based on it's uid *)
     member c.find uid = Map.find uid c.Map

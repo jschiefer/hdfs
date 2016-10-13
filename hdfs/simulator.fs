@@ -184,7 +184,7 @@ begin
       member x.ports = (x.inputs @ x.outputs @ x.wires)
 
       (** Find a port given a Uid *)
-      member x.port (uid:Uid) = match Map.tryfind uid x.sim_port_map with Some(x) -> x | _ -> failwith ("Could not find port " ^ string uid)
+      member x.port (uid:Uid) = match Map.tryFind uid x.sim_port_map with Some(x) -> x | _ -> failwith ("Could not find port " ^ string uid)
       (** Find a port given a Signal *)
       member x.port (signal:Signal) = x.port signal.uid
       (** Find a port given a string name *)
@@ -332,7 +332,7 @@ begin
           Map.add data_of_cond_match code_of_case map
         ) Map.empty cases in
         (fun () -> 
-          match Map.tryfind data_of_cond case_tasks_map with
+          match Map.tryFind data_of_cond case_tasks_map with
           | None -> ()
           | Some(x) -> x()
         )
