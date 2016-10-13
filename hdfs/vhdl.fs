@@ -310,7 +310,7 @@ port (
   let write_component comp_set (signal : Signal) = 
     match signal.signal with
     | Signal_inst(a,n,m,g,io,i,o) ->
-      if Set.mem n comp_set then comp_set
+      if Set.contains n comp_set then comp_set
       else (
         let port_decl str signal = (" " ^ signal_decl "in" signal ^ ";\n") in
         let port_map = fold_strings ";\n" 
@@ -336,7 +336,7 @@ port (
   let write_component2 comp_set (signal : Signal) = 
     match signal.signal with
     | Signal_inst2(a,s,_,_,_,_) ->
-      if Set.mem s.name comp_set then comp_set
+      if Set.contains s.name comp_set then comp_set
       else (
         let string_of_range = function
           | None -> ""

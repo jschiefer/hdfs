@@ -72,7 +72,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
   let write_cells comp_set (signal : Signal) = 
     match signal.signal with
     | Signal_inst(a,n,m,g,io,i,o) ->
-      if Set.mem n comp_set then comp_set
+      if Set.contains n comp_set then comp_set
       else (
         os ("    (cell " ^ n ^ " (cellType GENERIC)\n");
         os ("      (view PRIM (viewType netlist)\n");
@@ -162,7 +162,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
   (* write a net connection. *)
   let rec write_net set (port : PortRef) = 
     printf "WRITE_NET %s\n" port.signal.name;
-    if circuit.IsOutput port.signal && not (Set.mem port.signal.uid set) then 
+    if circuit.IsOutput port.signal && not (Set.contains port.signal.uid set) then 
       set
     else
       let set = Set.add port.signal.uid set in

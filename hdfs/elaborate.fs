@@ -49,7 +49,7 @@ let rec elaborate circuit circuits paths =
   
   (* Copy a circuit, renumber it's nodes and create new references.  (This is WAY harder than I thought it would be but you have to be careful here) *)
   let rec renumber_node set signal = 
-    let is_visited set (signal : Signal) = Set.mem (signal.uid) set in
+    let is_visited set (signal : Signal) = Set.contains (signal.uid) set in
     if is_visited set signal then (signal,set)
     else
       let set = Set.add (signal.uid) set in

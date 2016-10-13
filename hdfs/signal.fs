@@ -964,7 +964,7 @@ module Signal = begin
     let check_cases cond cases = 
       let idx_set cases = fold_left (fun set (idx, cond) -> 
           let idx_str = string_of_const idx in
-          if Set.mem idx_str set then failwith "Duplicate case index found";
+          if Set.contains idx_str set then failwith "Duplicate case index found";
           Set.add (bin_str_of_const idx) set) 
         Set.empty cases in
       let num = length cases in

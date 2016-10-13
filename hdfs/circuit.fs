@@ -69,7 +69,7 @@ let string_of_signal (x : Signal) = match x.signal with
 /// Given a signal recusively visits all it's dependants.  A set (of uid's) is used to ensure each node is visited 
 /// only once (the signal tree is cyclic).  Functions with a user argument are called before and after the recursion 
 let rec visit_signal set prefn postfn arg (signal : Signal) =
-  let is_visited set (signal : Signal) = Set.mem (signal.uid) set in
+  let is_visited set (signal : Signal) = Set.contains (signal.uid) set in
   if is_visited set signal then (arg,set)
   else
     let set = Set.add (signal.uid) set in
@@ -217,7 +217,7 @@ let scheduler dependants remaining computed =
     if remaining = [] then
       List.rev computed
     else
-      let is_computed (signal : Signal) = Set.mem (signal.uid) computed_set in
+      let is_computed (signal : Signal) = Set.contains (signal.uid) computed_set in
       let is_ready (signal : Signal) = List.for_all is_computed (List.filter ((<>) Signal.empty) (dependants signal)) in
       let ready, not_ready = List.partition is_ready remaining in
       if ready = [] then failed();
@@ -230,7 +230,7 @@ let scheduler dependants remaining computed =
 /// This function a generates map which tells you what it drives (fanout). 
 let connected_nodes_map outputs = 
   let rec connect_node (set,map) (signal:Signal) = 
-    let is_visited (signal : Signal) set = Set.mem (signal.uid) set in
+    let is_visited (signal : Signal) set = Set.contains (signal.uid) set in
     if is_visited signal set then set, map
     else
       let set = Set.add (signal.uid) set in
@@ -308,8 +308,8 @@ type Circuit = Circuit of
       ) (outputs @ inouts);
       let output_set       = List.fold (fun set (s : Signal) -> Set.add (s.uid) set) Set.empty outputs in
       let inout_set        = List.fold (fun set (s : Signal) -> Set.add (s.uid) set) Set.empty inouts in
-      let is_output (signal : Signal) = Set.mem (signal.uid) output_set in
-      let is_inout (signal : Signal)  = Set.mem (signal.uid) inout_set in
+      let is_output (signal : Signal) = Set.contains (signal.uid) output_set in
+      let is_inout (signal : Signal)  = Set.contains (signal.uid) inout_set in
 
       (* record all signals except outputs and inouts *)
       let all_signals outputs = 
@@ -385,16 +385,16 @@ type Circuit = Circuit of
     member c.find uid = Map.find uid c.Map
 
     (* is the signal an input *)
-    member c.IsInput uid = Set.mem uid c.InputsSet
-    member c.IsInput (s:Signal) = Set.mem s.uid c.InputsSet
+    member c.IsInput uid = Set.contains uid c.InputsSet
+    member c.IsInput (s:Signal) = Set.contains s.uid c.InputsSet
 
     (* is the signal an output *)
-    member c.IsOutput uid = Set.mem uid c.OutputsSet
-    member c.IsOutput (s:Signal) = Set.mem s.uid c.OutputsSet
+    member c.IsOutput uid = Set.contains uid c.OutputsSet
+    member c.IsOutput (s:Signal) = Set.contains s.uid c.OutputsSet
 
     (* is the signal an inout *)
-    member c.IsInout uid = Set.mem uid c.InoutsSet
-    member c.IsInout (s:Signal) = Set.mem s.uid c.InoutsSet
+    member c.IsInout uid = Set.contains uid c.InoutsSet
+    member c.IsInout (s:Signal) = Set.contains s.uid c.InoutsSet
 
   end
 
