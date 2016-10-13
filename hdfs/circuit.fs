@@ -185,7 +185,7 @@ and print_behave_node (f:System.IO.TextWriter) i node =
     os (i ^ "];\n")
   )
   | B_assign(B_assign_tgt(l,r,d,hi,lo), expr) ->
-    os (i ^ "(" ^ l.name ^ ", " ^ r.name ^ ", " ^ d.name ^ ")[" ^ string hi ^ ":" ^ string lo ^ "] $== " ^ expr.name ^ ";\n") 
+    os (i ^ "(" ^ l.name ^ ", " ^ r.name ^ ", " ^ d.name ^ ")[" ^ string hi ^ ":" ^ string lo ^ "] |== " ^ expr.name ^ ";\n") 
 
 (* *********************************************************** *)
 

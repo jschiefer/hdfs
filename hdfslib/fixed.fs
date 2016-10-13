@@ -571,15 +571,15 @@ and UFixedBehaveAssignTarget = UFixed_bassign_tgt of UFixed * UFixed * UFixed * 
 
     member target.assign (expr : UFixed) = 
       let (UFixed_bassign_tgt(a,b,c,d,e)) = target
-      B_assign_tgt(a.signal,b.signal,c.signal,d,e) $== expr.signal
-    member target.assign (expr : int) = target $== target.q.consti expr
-    member target.assign (expr : float) = target $== target.q.constf expr
+      B_assign_tgt(a.signal,b.signal,c.signal,d,e) |== expr.signal
+    member target.assign (expr : int) = target |== target.q.consti expr
+    member target.assign (expr : float) = target |== target.q.constf expr
 
-    static member ($==) ((target : UFixedBehaveAssignTarget), (expr : UFixed)) = target.assign expr
+    static member (|==) ((target : UFixedBehaveAssignTarget), (expr : UFixed)) = target.assign expr
     
-    static member ($==) ((target : UFixedBehaveAssignTarget), (expr : int)) = target.assign expr
+    static member (|==) ((target : UFixedBehaveAssignTarget), (expr : int)) = target.assign expr
     
-    static member ($==) ((target : UFixedBehaveAssignTarget), (expr : float)) = target.assign expr
+    static member (|==) ((target : UFixedBehaveAssignTarget), (expr : float)) = target.assign expr
     
     member x.set_name name = 
       let (UFixed_bassign_tgt(a,b,c,d,e)) = x in
@@ -1051,15 +1051,15 @@ and SFixedBehaveAssignTarget = SFixed_bassign_tgt of SFixed * SFixed * SFixed * 
 
     member target.assign (expr : SFixed) = 
       let (SFixed_bassign_tgt(a,b,c,d,e)) = target
-      B_assign_tgt(a.signal,b.signal,c.signal,d,e) $== expr.signal
-    member target.assign (expr : int) = target $== target.q.consti expr
-    member target.assign (expr : float) = target $== target.q.constf expr
+      B_assign_tgt(a.signal,b.signal,c.signal,d,e) |== expr.signal
+    member target.assign (expr : int) = target |== target.q.consti expr
+    member target.assign (expr : float) = target |== target.q.constf expr
 
-    static member ($==) ((target : SFixedBehaveAssignTarget), (expr : SFixed)) = target.assign expr
+    static member (|==) ((target : SFixedBehaveAssignTarget), (expr : SFixed)) = target.assign expr
     
-    static member ($==) ((target : SFixedBehaveAssignTarget), (expr : int)) = target.assign expr
+    static member (|==) ((target : SFixedBehaveAssignTarget), (expr : int)) = target.assign expr
     
-    static member ($==) ((target : SFixedBehaveAssignTarget), (expr : float)) = target.assign expr
+    static member (|==) ((target : SFixedBehaveAssignTarget), (expr : float)) = target.assign expr
     
     member x.set_name name = 
       let (SFixed_bassign_tgt(a,b,c,d,e)) = x in

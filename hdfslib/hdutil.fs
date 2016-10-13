@@ -164,7 +164,7 @@ let binary_to_one_hot addr n =
     behave [
       b_switch (addr) (
         List.map 
-          (fun i -> b_case (consti wid i) [ one_hot $== const1h n i; ])
+          (fun i -> b_case (consti wid i) [ one_hot |== const1h n i; ])
             [ 0 .. (n-1) ]
       )
     ];
@@ -180,7 +180,7 @@ let one_hot_to_binary_b onehot =
   behave 
     [
       b_switch onehot
-        [ for i in { 0 .. owidth-1 } -> b_case (const1h owidth i) [ binary $== consti bwidth i ] ]
+        [ for i in { 0 .. owidth-1 } -> b_case (const1h owidth i) [ binary |== consti bwidth i ] ]
     ];
   binary.q
 
@@ -383,7 +383,7 @@ type StateEnum =
     
     static member (==~) ((state:StateEnum), (s:string)) = (==~) state.q (state.[s] : Signal)
     static member (/=~) ((state:StateEnum), (s:string)) = (/=~) state.q (state.[s] : Signal)
-    static member ($==) ((state:StateEnum), (s:string)) = ($==) state.v (state.[s] : Signal)
+    static member (|==) ((state:StateEnum), (s:string)) = (|==) state.v (state.[s] : Signal)
 
   end
 
