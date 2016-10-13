@@ -84,7 +84,7 @@ let cordic pre cdc_type fix iters clock reset ena vld_in x y z vecmode =
   let fconst f = consti bits (int (scale * f)) in
 
   let shift_mux hyper addr v = 
-    let range = if hyper then List.tl (range (iters+1)) else (range iters) in
+    let range = if hyper then List.tail (range (iters+1)) else (range iters) in
     mux addr (List.map (fun x -> v >>+ x) range) in
 
   (* iter -> index map for hyperbolic functions *)

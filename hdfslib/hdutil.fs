@@ -45,8 +45,8 @@ let range n =
 let lselect l lo hi = 
     let rec ls l idx lo hi = 
         if idx > hi then []
-        else if idx < lo then ls (List.tl l) (idx+1) lo hi
-        else (List.hd l) :: (ls (List.tl l) (idx+1) lo hi) in 
+        else if idx < lo then ls (List.tail l) (idx+1) lo hi
+        else (List.head l) :: (ls (List.tail l) (idx+1) lo hi) in 
     ls l 0 lo hi 
 
 (** Selects the even elements from a list *)
@@ -118,7 +118,7 @@ let mod_counter max c =
 (** creates a tree of operations.  The arity of the operator is configurable *)
 let rec tree arity ops l =
   let split l n =
-     let (lh,ll,_) = List.fold_left (fun (l0,l1,m) e ->
+     let (lh,ll,_) = List.fold (fun (l0,l1,m) e ->
        if m < n then ((e::l0),l1,m+1) else (l0,e::l1,m+1)) ([],[],0) l in
      (List.rev lh, List.rev ll) in
   let rec t0 l =
@@ -213,11 +213,11 @@ let count_leading_zeros vector =
   let celln ca a b = [ a |~ (ca &~ b) ] in
   let rec build_cell msb al bl = (* al, bl same length, start from lsb *)
     match List.length al with
-    | 1 -> cell2 (List.hd al) (List.hd bl)
+    | 1 -> cell2 (List.head al) (List.head bl)
     | _ -> 
-      let a,b = List.hd al, List.hd bl in
-      (celln msb a b) @ (build_cell msb (List.tl al) (List.tl bl)) in
-  let build_cell al bl = List.rev (build_cell (List.hd al) (List.rev al) (List.rev bl)) in
+      let a,b = List.head al, List.head bl in
+      (celln msb a b) @ (build_cell msb (List.tail al) (List.tail bl)) in
+  let build_cell al bl = List.rev (build_cell (List.head al) (List.rev al) (List.rev bl)) in
 
   (* [a;b;c;d;...] -> [(a,b);(c;d);...] *)
   let rec pair_list l = 
@@ -313,14 +313,14 @@ let make_states clock reset enable states =
   let num_states = List.length states in
   let log_states = clog2 (num_states-1) in
   let states = List.mapi (fun i x -> (i,x)) states in
-  let map = List.fold_left (fun map (idx,str) -> Map.add str (consti log_states idx) map) Map.empty states in
+  let map = List.fold (fun map (idx,str) -> Map.add str (consti log_states idx) map) Map.empty states in
   b_reg clock reset Signal.empty enable log_states, (fun str -> Map.find str map)
 
 (** Constructs a statemachine using a one-hot encoding *)
 let make_states_onehot clock reset enable states = 
   let num_states = List.length states in
   let states = List.mapi (fun i x -> (i,x)) states in
-  let map = List.fold_left (fun map (idx,str) -> Map.add str (const1h num_states idx) map) Map.empty states in
+  let map = List.fold (fun map (idx,str) -> Map.add str (const1h num_states idx) map) Map.empty states in
   b_reg clock reset (const1h num_states 0) enable num_states, (fun str -> Map.find str map)
 
 
@@ -330,7 +330,7 @@ let make_states_gray clock reset enable states =
   let log_states = clog2 (num_states-1) in
   let gray_strings = lselect (make_gray_code_strings log_states) 0 (num_states-1) in
   let states = List.map2 (fun x g -> (x,g)) states gray_strings in
-  let map = List.fold_left (fun map (str,gray) -> Map.add str (constb gray) map) Map.empty states in
+  let map = List.fold (fun map (str,gray) -> Map.add str (constb gray) map) Map.empty states in
   b_reg clock reset Signal.empty enable log_states, (fun str -> Map.find str map)
 
 (*****************************************************************************)

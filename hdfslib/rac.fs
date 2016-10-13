@@ -36,7 +36,7 @@ exception Rac_error of string
 (** Builds a signed or unsigned RAC *)
 let rac signed clock reset ena load inputs coeffs coeff_bits = 
 
-    let input_bits  = width (List.hd inputs) in
+    let input_bits  = width (List.head inputs) in
     let output_bits = input_bits + coeff_bits in
     let num_inputs  = List.length inputs in
     let num_coeffs  = List.length coeffs in
@@ -64,7 +64,7 @@ let rac signed clock reset ena load inputs coeffs coeff_bits =
     (* rom address *)
     let addr_bits = List.map (fun x -> lsb x) piso_regs in
     let addr_wire = wire (num_inputs) in
-    let addr      = List.fold_left (fun addr bit -> bit ++ addr) (List.hd addr_bits) (List.tl addr_bits) in
+    let addr      = List.fold (fun addr bit -> bit ++ addr) (List.head addr_bits) (List.tail addr_bits) in
         addr_wire <== addr;
 
     (* rom *)

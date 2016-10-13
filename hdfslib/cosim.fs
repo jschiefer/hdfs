@@ -33,7 +33,6 @@ open Numeric
 open Circuit
 open Signal
 open Simulator
-open List
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 

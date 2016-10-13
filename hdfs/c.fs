@@ -147,9 +147,9 @@ let write mode (f:System.IO.TextWriter) name (circuit : Circuit) =
     | _ -> failwith "Expected a memory"
   in
 
-  let data_map = List.fold_left make_data_map Map.empty (logic @ inputs @ outputs @ wires @ regs @ mems) in
-  let seq_data_map = List.fold_left make_data_map Map.empty regs in
-  let mem_data_map = List.fold_left make_memories_map Map.empty mems in
+  let data_map = List.fold make_data_map Map.empty (logic @ inputs @ outputs @ wires @ regs @ mems) in
+  let seq_data_map = List.fold make_data_map Map.empty regs in
+  let mem_data_map = List.fold make_memories_map Map.empty mems in
 
   let find (signal : Signal) = Map.find signal.uid data_map in
   let find_seq (signal : Signal) = Map.find signal.uid seq_data_map in
@@ -547,7 +547,7 @@ public HDFS_Int num_ports;
           let range0 = List.rev [ offset0 .. (offset0 + words - 1) ] in
           let range1 = List.rev [ offset1 .. (offset1 + words - 1) ] in
           let test o0 o1 = "\n    " ^ mem_at o0 ^ " < " ^ mem_at o1 ^ " ? (HDFS_Int) 1 : " ^ mem_at o0 ^ " > " ^ mem_at o1 ^ " ? (HDFS_Int) 0 : " in
-          os ("  " ^ mem_at offset ^ " = " ^ (List.fold_left (fun acc (o0,o1) -> acc ^ (test o0 o1)) "" (List.zip range0 range1)) ^ "(HDFS_Int) 0;\n")
+          os ("  " ^ mem_at offset ^ " = " ^ (List.fold (fun acc (o0,o1) -> acc ^ (test o0 o1)) "" (List.zip range0 range1)) ^ "(HDFS_Int) 0;\n")
       
       | B_cat -> 
         if debug then os ("  // concat (" ^ string w0 ^ " & " ^ string w1 ^ ")\n");
@@ -944,7 +944,7 @@ let create_csim path name =
     let ports     = ports.GetValue(sim) :?> System.Object array in
 
     (* split ports into inputs,  outputs and wires *)
-    let ports = List.of_array ports in
+    let ports = List.ofArray ports in
     let sel_port dir = List.filter (fun x -> (port_type.GetValue(x) :?> int) = dir) in
     let inputs = sel_port 0 ports in
     let wires = sel_port 1 ports in
@@ -1011,8 +1011,8 @@ let create_csim path name =
       sim_inputs   = inputs;
       sim_wires    = wires;
       sim_outputs  = outputs;
-      sim_port_map = List.fold_left (fun map (s:Port) -> Map.add s.uid s map) Map.empty (inputs @ wires @ outputs);
-      sim_name_map = List.fold_left (fun map (s:Port) -> Map.add s.name s.uid map) Map.empty (inputs @ wires @ outputs);
+      sim_port_map = List.fold (fun map (s:Port) -> Map.add s.uid s map) Map.empty (inputs @ wires @ outputs);
+      sim_name_map = List.fold (fun map (s:Port) -> Map.add s.name s.uid map) Map.empty (inputs @ wires @ outputs);
       sim_data_map = Map.empty;
       sim_reg_map  = Map.empty;
       sim_mem_map  = Map.empty;

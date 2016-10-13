@@ -24,7 +24,6 @@ module DigitalLogic.Resources
 open DigitalLogic
 open Circuit
 open Signal
-open List
 
 (** Writes a report of the hardware primitives used in the circuit to the given file *)
 let report f (circuit : Circuit) =
@@ -87,18 +86,18 @@ let report f (circuit : Circuit) =
   | Signal_mem      (a,dw,aw,size,clk,w,we,d,r)-> incr signal_mem [size; dw] 
   | Signal_behave   (a,w,b,d)       -> incr signal_behave [] 
   | Signal_inst     (a,n,m,g,io,i,o)  -> incr signal_inst   [] 
-  | Signal_tri      (a,w,d)         -> incr signal_tri    [length d; w] in (* we should probably also be interested in the number of drivers *)
+  | Signal_tri      (a,w,d)         -> incr signal_tri    [List.length d; w] in (* we should probably also be interested in the number of drivers *)
 
-  iter incr_signal circuit.All;
+  List.iter incr_signal circuit.All;
 
   let rep_fn arg name = 
     let l = !arg in
-    let num = length l in
+    let num = List.length l in
     match num with
     | 0 -> ()
     | _ -> (
       os (name ^ ": " ^ string num ^ "\n");
-      let parts = length (hd l) in
+      let parts = List.length (List.head l) in
       match parts with
       | 0 -> ()
       | n -> (
@@ -106,12 +105,12 @@ let report f (circuit : Circuit) =
           match l with
           | [] -> []
           | hd :: tl ->
-            let a = filter ((=) hd) tl in
-            let b = filter ((<>) hd) tl in
-            (hd, (length a)+1) :: build b in
+            let a = List.filter ((=) hd) tl in
+            let b = List.filter ((<>) hd) tl in
+            (hd, (List.length a)+1) :: build b in
         let l = build l in
-        let s l = fold_strings " x " (map string l) in
-        iter (fun (v,c) -> os ("  " ^ string c ^ ": " ^ s v ^ " bits \n")) l
+        let s l = fold_strings " x " (List.map string l) in
+        List.iter (fun (v,c) -> os ("  " ^ string c ^ ": " ^ s v ^ " bits \n")) l
       )
     ) in
   
@@ -144,11 +143,11 @@ let report f (circuit : Circuit) =
   ] in
    
   os ("*****\nLogic\n*****\n");
-  iter (fun (arg,name,fn) -> fn arg name) logic_data;
+  List.iter (fun (arg,name,fn) -> fn arg name) logic_data;
   os ("********\nLanguage\n********\n");
-  iter (fun (arg,name,fn) -> fn arg name) language_data;
+  List.iter (fun (arg,name,fn) -> fn arg name) language_data;
   os ("***********************\nInstantiated components\n***********************\n");
-  iter 
+  List.iter 
     (fun x ->
       match x.su with
       | Signal_inst(a,n,m,g,io,i,o) ->

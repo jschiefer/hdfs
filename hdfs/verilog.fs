@@ -23,7 +23,6 @@ module DigitalLogic.Verilog
 
 open DigitalLogic.Circuit
 open DigitalLogic.Signal
-open List
 
 (** Given an output channel, circuit name and circuit datatype writes a Verilog netlist *)
 let write (f:System.IO.TextWriter) name (circuit : Circuit) = 
@@ -53,15 +52,15 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
 
   (* outputs *)
   let outputs = circuit.Outputs in
-  let output_names = map (fun s -> wire_name s) outputs in
+  let output_names = List.map (fun s -> wire_name s) outputs in
 
   (* inputs *)
   let inputs = circuit.Inputs in
-  let input_names = map (fun (s : Signal) -> s.name) inputs in
+  let input_names = List.map (fun (s : Signal) -> s.name) inputs in
   
   (* inouts *)
   let inouts = circuit.Inouts in
-  let inout_names = map (fun (s : Signal) -> s.name) inouts in
+  let inout_names = List.map (fun (s : Signal) -> s.name) inouts in
   
   let is_in_circuit (signal : Signal) = circuit.mem (signal.uid) in
   
@@ -75,9 +74,9 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
 
   let write_net sigtype s = os (" " ^ sigtype ^ " " ^ range_of_signal s ^ s.name ^ ";\n") in
   
-  iter (fun x -> write_net "input" x) inputs;
-  iter (fun s -> os (" output " ^ range_of_signal s ^ wire_name s ^ ";\n")) outputs;
-  iter (fun s -> os (" inout " ^ range_of_signal s ^ wire_name s ^ ";\n")) inouts;
+  List.iter (fun x -> write_net "input" x) inputs;
+  List.iter (fun s -> os (" output " ^ range_of_signal s ^ wire_name s ^ ";\n")) outputs;
+  List.iter (fun s -> os (" inout " ^ range_of_signal s ^ wire_name s ^ ";\n")) inouts;
 
   let string_of_signal (x : Signal) = match x.signal with
     | Signal_empty     -> 
@@ -100,7 +99,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
       else
         s.name ^ "[" ^ string hi ^ ":" ^ string lo ^ "]"
     | Signal_mux      (a,w,sel,d) -> (* only for simple 1 bit select, two state mux's *)
-        ("( " ^ sel.name ^ " ? " ^ (hd (tl d)).name ^ " : " ^ (hd d).name ^ " )")
+        ("( " ^ sel.name ^ " ? " ^ (List.head (List.tail d)).name ^ " : " ^ (List.head d).name ^ " )")
     | Signal_reg      (_) -> failwith "unexpected reg"
     | Signal_mem      (_) -> failwith "unexpected mem"
     | Signal_behave   (_) -> failwith "unexpected behave"
@@ -109,13 +108,13 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
   in
   
   let is_always (x:Signal) = match x.signal with
-    | Signal_mux (a,w,sel,d) when (width sel <> 1) || (length d <> 2) -> true
+    | Signal_mux (a,w,sel,d) when (width sel <> 1) || (List.length d <> 2) -> true
     | Signal_reg (_)
     | Signal_behave (_) 
     | Signal_mem (_) -> true
     | _ -> false in
   
-  let rec write_behave t i nodes = iter (write_behave_node t i) nodes
+  let rec write_behave t i nodes = List.iter (write_behave_node t i) nodes
   and write_behave_node t i node = 
     match node with
     | B_if(cond, on_true, on_false) -> (
@@ -127,7 +126,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
     )
     | B_switch(cond, cases) -> (
       os (i ^ "case ( " ^ cond.name ^ " ) \n");
-      iter (fun (idx, statements) -> 
+      List.iter (fun (idx, statements) -> 
         os (i ^ " " ^ string_of_signal idx ^ ": begin\n");
         write_behave t (i^"  ") statements;
         os (i ^ " end\n");
@@ -163,7 +162,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
        os (" assign " ^ s.name ^ " = " ^ array_name ^ "[" ^ r.name ^ "];\n"))
        
     | Signal_mux(a,w,sel,d) -> (
-      let num_cases = length d in
+      let num_cases = List.length d in
       let rec cases n (d : Signal list) = 
         match d with 
         | [] -> failwith "empty mux"
@@ -207,12 +206,12 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
     match signal.signal with
     | Signal_inst(a,n,m,g,io,i,o) ->
       let connect c = "." ^ fst c ^ "(" ^ (if is_in_circuit (snd c) then (snd c).name else "") ^ ")" in
-      let generics = map (fun (n,t,d) -> 
+      let generics = List.map (fun (n,t,d) -> 
           match d with | None -> "" | Some d -> "." ^ n ^ "(" ^ (string_of_generic_data t d) ^ ")"
         ) g in
-      let generics = filter ((<>) "") generics in
+      let generics = List.filter ((<>) "") generics in
       let generics = fold_strings ", " generics in
-      let ports = (map connect i) @ (map connect o) @ (map connect io) in
+      let ports = (List.map connect i) @ (List.map connect o) @ (List.map connect io) in
       os (" " ^ n ^ 
         (if generics <> "" then " #(" ^ generics ^ ")" else "") ^ 
         " the_" ^ signal.name ^ " (" ^ (fold_strings ", " ports) ^ ");\n")
@@ -234,7 +233,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
     let rec zzz n = if n = 0 then "" else "z" ^ zzz (n-1) in
     match signal.signal with 
     | Signal_tri(a,w,d) ->
-      iter (fun ((oe : Signal),(d : Signal)) -> 
+      List.iter (fun ((oe : Signal),(d : Signal)) -> 
         os (" assign " ^ signal.name ^ " = " ^ oe.name ^ " ? " ^ d.name ^ " : " ^ string d.width ^ "'b" ^ (zzz d.width) ^ ";\n")
       ) d
     | _ -> failwith ("Excepting a tristate, got " ^ Circuit.string_of_signal signal) 
@@ -256,22 +255,22 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
   in
   
   os "\n /* constants */\n";
-  iter write_const_net circuit.Constants;
+  List.iter write_const_net circuit.Constants;
  
   os "\n /* forward wire declarations */\n";
-  iter write_wire circuit.Wires;
-  iter write_wire circuit.Logic;
-  iter write_wire circuit.Regs;
-  iter write_mem_wires circuit.Memories;
+  List.iter write_wire circuit.Wires;
+  List.iter write_wire circuit.Logic;
+  List.iter write_wire circuit.Regs;
+  List.iter write_mem_wires circuit.Memories;
   os "\n /* logic declarations */\n";
-  iter write_decl circuit.Logic;
-  iter write_decl circuit.Regs;
-  iter write_decl circuit.Memories;
-  iter write_inst circuit.Inst;
+  List.iter write_decl circuit.Logic;
+  List.iter write_decl circuit.Regs;
+  List.iter write_decl circuit.Memories;
+  List.iter write_inst circuit.Inst;
   os "\n /* wire connections */\n";
-  iter write_connections circuit.Wires;
-  iter write_connections circuit.Outputs;
-  iter write_connections (filter (fun x -> not (wire_connection x).IsInst) circuit.Inouts);
+  List.iter write_connections circuit.Wires;
+  List.iter write_connections circuit.Outputs;
+  List.iter write_connections (List.filter (fun x -> not (wire_connection x).IsInst) circuit.Inouts);
   
   os "\nendmodule\n";
   

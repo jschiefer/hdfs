@@ -24,7 +24,6 @@ module DigitalLogic.Fsharp
 open DigitalLogic
 open Circuit
 open Signal
-open List
 
 (** Given an output channel, circuit name and circuit datatype writes the circuit as hdfs (elaborated) *)
 let write (f:System.IO.TextWriter) name (circuit : Circuit) = 
@@ -56,7 +55,7 @@ open Design
 let " ^ name ^ " () = 
 ");
 
-  let list_of_signals signals = "[ " ^ (fold_strings "; " (map (fun (s : Signal) -> s.name) signals)) ^ " ]" in
+  let list_of_signals signals = "[ " ^ (fold_strings "; " (List.map (fun (s : Signal) -> s.name) signals)) ^ " ]" in
 
   let rec string_of_signal (x : Signal) = match x.signal with
     | Signal_empty    -> "empty"
@@ -76,11 +75,11 @@ let " ^ name ^ " () =
     | Signal_inst     (a,n,m,g,io,i,o) -> 
       let connect (c : string * Signal) = ("(\"" ^ fst c ^ "\" ==> " ^ (snd c).name ^ ")") in
       ("(instgio \"" ^ name ^ "\" " ^ " [] [ " ^ (* doesnt support generics ... *)
-        (fold_strings "; " (map connect io)) ^ " ] [ " ^
-        (fold_strings "; " (map connect i)) ^ " ] [ " ^
-        (fold_strings "; " (map connect o)) ^ " ])")
+        (fold_strings "; " (List.map connect io)) ^ " ] [ " ^
+        (fold_strings "; " (List.map connect i)) ^ " ] [ " ^
+        (fold_strings "; " (List.map connect o)) ^ " ])")
     | Signal_tri      (a,w,d) ->
-      ("(tristate [ ^ " ^ (fold_strings "; " (map (fun ((oe : Signal),(d : Signal)) -> "(" ^ oe.name ^ ", " ^ d.name ^ ")") d)) ^ " ])")
+      ("(tristate [ ^ " ^ (fold_strings "; " (List.map (fun ((oe : Signal),(d : Signal)) -> "(" ^ oe.name ^ ", " ^ d.name ^ ")") d)) ^ " ])")
   in
   
   let write_input (signal : Signal) = os (" let " ^ signal.name ^ " = input \"" ^ signal.name ^ "\" " ^ string (signal.width) ^ " in\n") in
@@ -114,17 +113,17 @@ let " ^ name ^ " () =
   in
 
   os "\n (* inputs. *)\n";
-  iter write_input inputs;
+  List.iter write_input inputs;
   os "\n (* wires. *)\n";
-  iter write_wire wires;
+  List.iter write_wire wires;
   os "\n (* logic. *)\n";
-  iter (fun (s : Signal) -> if not (s.IsEmpty) then write_decl s) schedule;
+  List.iter (fun (s : Signal) -> if not (s.IsEmpty) then write_decl s) schedule;
   os "\n (* instantiations. *)\n";
-  iter (fun (s : Signal) -> write_decl s) circuit.Inst;
+  List.iter (fun (s : Signal) -> write_decl s) circuit.Inst;
   os "\n (* connections. *)\n";
-  iter (fun (s : Signal) -> if not s.IsEmpty then write_connection s) circuit.Wires;
+  List.iter (fun (s : Signal) -> if not s.IsEmpty then write_connection s) circuit.Wires;
   os "\n (* outputs *)\n [\n";
-  iter write_output outputs;
+  List.iter write_output outputs;
   os " ]\n";
 
   timing "Wrote f# in" t0 System.DateTime.Now

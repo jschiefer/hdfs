@@ -21,10 +21,11 @@
 (** Fully elaborated fft algorithm. *)
 module DigitalLogic.Circuits.Fft
 
+open System.Numerics
 open DigitalLogic.Numeric.Ops
 open DigitalLogic.Signal
 open DigitalLogic.Util
-open List
+
 open Microsoft.FSharp.Math
 
 let pi = 3.1415926535897932384626433832795 
@@ -78,8 +79,8 @@ let rec fft_ref inputs w =
       if k = n then []
       else
       begin
-        let qk = nth q (k % (n/2)) in
-        let tk = nth t (k % (n/2)) in
+        let qk = List.nth q (k % (n/2)) in
+        let tk = List.nth t (k % (n/2)) in
         let kf = float k in
         let wf = c_pow w kf in
         let rs = (qk + (wf * tk)) in
@@ -93,7 +94,7 @@ let rec fft_ref inputs w =
 
 (** Hardware fft implementation *)
 let rec fft inputs w wbits = 
-  let n = length inputs in
+  let n = List.length inputs in
 
   let re = fst in
   let im = snd in
@@ -129,8 +130,8 @@ let rec fft inputs w wbits =
       if k = n then []
       else
       begin
-        let qk = nth q (k % (n/2)) in
-        let tk = nth t (k % (n/2)) in
+        let qk = List.nth q (k % (n/2)) in
+        let tk = List.nth t (k % (n/2)) in
         let kf = float k in
         let wf = c_pow w kf in
         let rr,ir = (cadd qk (cmulw (cw wf wbits) tk)) in

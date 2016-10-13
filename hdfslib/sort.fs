@@ -85,9 +85,9 @@ let odd_even_tranposition sort_fn pipeline inputs vld =
       (* even *)
       let even = sort l in
       let vld = pipeline vld in
-      let odd = sort (List.tl even) in
+      let odd = sort (List.tail even) in
       let vld = pipeline vld in
-      sort_stages (n+1) ((pipeline (List.hd even)) :: odd) vld in
+      sort_stages (n+1) ((pipeline (List.head even)) :: odd) vld in
   
   sort_stages 0 inputs vld
 
@@ -95,7 +95,7 @@ let odd_even_tranposition sort_fn pipeline inputs vld =
 /// <P>Odd even merge sort (written in an imperative style).<P>
 /// <P><I>Note: Pipelining doesnt work (results come a different times) and valid not well thought out. As a combinatorial network is the best of the bunch though.</I><P>
 let odd_even_merge sort_fn pipeline inputs vld =
-  let a = Array.of_list inputs in
+  let a = Array.ofList inputs in
   let compare_exchange i j =
     let ai = a.[i] in
     let aj = a.[j] in
@@ -132,7 +132,7 @@ let odd_even_merge sort_fn pipeline inputs vld =
   in
   
   let vld = merge_sort 0 (Array.length a) vld in
-  Array.to_list a, vld
+  Array.toList a, vld
   
 let test_sort() = 
   let inputs = List.mapi (fun y x -> constb x ++ consti 3 y) [ "0001"; "0011"; "0101"; "0010"; "1111"; "1011"; "0000"; "1010" ] in
@@ -154,7 +154,7 @@ let seq_sort sort_fn clock reset cnt clr d (we:Signal) a =
   
   (* registers storing partially/fully sorted values *)
   let _,_,sregs = 
-    List.fold_left (fun (v_prev,prev,regs) (ena,ld) ->
+    List.fold (fun (v_prev,prev,regs) (ena,ld) ->
       let v = reg clock reset empty (ena |~ clr) (mux2 clr gnd (mux2 ld vdd v_prev)) in
       let r = reg clock reset empty ena (mux2 ld d prev) in
       v, r, (v -- "V", r -- "Q") :: regs
@@ -162,7 +162,7 @@ let seq_sort sort_fn clock reset cnt clr d (we:Signal) a =
   let sregs = List.zip (List.rev sregs) ctrl in
   
   (* control logic *)
-  List.fold_left (fun prev_less ((vld,cur),(ena,ld)) ->
+  List.fold (fun prev_less ((vld,cur),(ena,ld)) ->
     let less = mux2 vld (sort_fn d cur) vdd -- "less"in
     ena <== (less &~ we);
     ld <== (~~~ prev_less);

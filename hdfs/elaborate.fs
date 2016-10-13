@@ -25,7 +25,6 @@ open DigitalLogic
 open Circuit
 open Signal
 open System.Reflection
-open List
 
 exception Dynload_method of MethodInfo
 exception Elaborate_error of string
@@ -100,25 +99,25 @@ let rec elaborate circuit circuits paths =
         su (Signal_behave(a,w,b,d)), set
       | Signal_inst     (a,n,m,g,io,i,o)             ->                          (* not sure about io here *)
         let a = signal_incr_uid() in 
-        let ii, set = renumber_nodes set (map snd i) in
-        let ioo, set = renumber_nodes set (map snd io) in
-        su (Signal_inst(a,n,m,g, map2 (fun i ii -> fst i, ii) io ioo, map2 (fun i ii -> fst i, ii) i ii, o)), set
+        let ii, set = renumber_nodes set (List.map snd i) in
+        let ioo, set = renumber_nodes set (List.map snd io) in
+        su (Signal_inst(a,n,m,g, List.map2 (fun i ii -> fst i, ii) io ioo, map2 (fun i ii -> fst i, ii) i ii, o)), set
     | Signal_tri      (a,w,d) -> 
         let a = signal_incr_uid() in 
-        let oe = map fst d in
-        let dd = map snd d in
+        let oe = List.map fst d in
+        let dd = List.map snd d in
         let oe, set = renumber_nodes set oe in
         let dd, set = renumber_nodes set dd in
-        let d = map2 (fun x y -> (x,y)) oe dd in
+        let d = List.map2 (fun x y -> (x,y)) oe dd in
         su (Signal_tri(a,w,d)), set
 
   and renumber_nodes set signals = 
-    let signals, set = fold_left 
+    let signals, set = List.fold 
       (fun (signals,set) signal -> 
         let signal,set = renumber_node set signal in
         (signal::signals,set)
       ) ([],Set.empty) signals in
-    rev signals, set
+    List.rev signals, set
   in
   
   let renumber_nodes signals = 
@@ -163,20 +162,20 @@ let rec elaborate circuit circuits paths =
   in
 
   let connect_inputs inst_inputs inputs = 
-    iter (fun wire ->
+    List.iter (fun wire ->
       let input_name = wire_name wire in
       let inst_input = 
-        try find (fun x -> (fst x) = input_name) inst_inputs
+        try List.find (fun x -> (fst x) = input_name) inst_inputs
         with _ -> failwith ("Could not find input connection for " ^ input_name) in
       (clear_name wire) |<==| (snd inst_input)        
     ) inputs
   in
 
   let connect_outputs inst_outputs outputs = 
-    iter (fun wire ->
+    List.iter (fun wire ->
       let output_name = wire_name wire in
       let inst_output = 
-        try find (fun x -> (fst x) = output_name) inst_outputs
+        try List.find (fun x -> (fst x) = output_name) inst_outputs
         with _ -> failwith ("Could not find output connection for " ^ output_name) in
       (snd inst_output) |<==| (clear_name wire)        
     ) outputs

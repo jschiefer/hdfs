@@ -14,7 +14,7 @@ let divide_const
   let max_quotient = max_dividend / divisor in
   let quotient_bits = DigitalLogic.Util.clog2 max_quotient in
   let quot_bits, remainder = 
-    List.fold_left (fun (bits, cur) i ->
+    List.fold (fun (bits, cur) i ->
       let c = consti (width dividend) (divisor <<< i) in
       let gteq = cur >=~ c in
       gteq :: bits, mux2 gteq (cur - c) cur
@@ -24,7 +24,7 @@ let divide_const
 (** Unsigned divide *)
 let divide dividend divisor = 
   let quot_bits, remainder = 
-    List.fold_left (fun (bits, cur) (i:int) ->
+    List.fold (fun (bits, cur) (i:int) ->
       let c = ((zero (width dividend)) ++ divisor) <<~ i in
       let gteq = cur >=~ c in
       gteq :: bits, mux2 gteq (cur - c) cur

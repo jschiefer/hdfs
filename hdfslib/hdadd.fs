@@ -40,7 +40,7 @@ let check_same x y = DigitalLogic.Signal.check_same [x;y]
 let rec map3 fn x y z = 
     match x with
     | [] -> []
-    | _ -> (fn (List.hd x) (List.hd y) (List.hd z)) :: map3 fn (List.tl x) (List.tl y) (List.tl z)
+    | _ -> (fn (List.head x) (List.head y) (List.head z)) :: map3 fn (List.tail x) (List.tail y) (List.tail z)
     
 (*******************************************************************)
 (*******************************************************************)
@@ -78,8 +78,8 @@ let carry_ripple_adder cin x y =
   let rec build x y sum carry = 
     if (List.length x) = 0 then carry :: sum
     else
-      let c, s = fa (List.hd x) (List.hd y) carry in
-      build (List.tl x) (List.tl y) (s::sum) c in
+      let c, s = fa (List.head x) (List.head y) carry in
+      build (List.tail x) (List.tail y) (s::sum) c in
   let sum = build x y [] cin in
   concat sum
 

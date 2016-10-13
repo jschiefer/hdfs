@@ -106,7 +106,7 @@ let drawf (dcfg : 'a sim_data_t) cfg signals =
   let ySize = cfg.font.Height + (2*(cfg.yMargin+cfg.fontMargin)) in
   let x_cursor = ref 0 in
   
-  let num_transitions = List.fold_left (fun a (_,_,b,_) -> let b = Array.length b in if a < b then b else a) 0 signals in
+  let num_transitions = List.fold (fun a (_,_,b,_) -> let b = Array.length b in if a < b then b else a) 0 signals in
   let num_signals = List.length signals in
   (* create and array which indicates where transitions happen *)
   let signals = List.map (fun (name,wid,c,f) ->

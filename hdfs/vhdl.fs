@@ -24,7 +24,6 @@ module DigitalLogic.Vhdl
 open DigitalLogic.Numeric.Conversions
 open DigitalLogic.Circuit
 open DigitalLogic.Signal
-open List
 
 (** Given an output channel, circuit name and circuit datatype writes a VHDL netlist *)
 let write (f:System.IO.TextWriter) name (circuit : Circuit) = 

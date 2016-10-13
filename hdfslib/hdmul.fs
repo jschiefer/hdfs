@@ -28,7 +28,6 @@ open Numeric.Ops
 open Signal
 open Util
 open Circuits.Add
-open List
 
 (*
   From wikipedia:
@@ -77,11 +76,11 @@ let build_weights a b =
     if w > max_weight then []
     else
       let make_weight w = 
-        map (fun x -> match x with None -> failwith "" | Some x -> x)
-          (filter ((<>) None) 
-            (concat 
-              (map (fun i -> 
-                map (fun j -> if i+j = w then Some (bit a i &~ bit b j) else None) [ 0 .. wb-1 ]
+        List.map (fun x -> match x with None -> failwith "" | Some x -> x)
+          (List.filter ((<>) None) 
+            (List.concat 
+              (List.map (fun i -> 
+                List.map (fun j -> if i+j = w then Some (bit a i &~ bit b j) else None) [ 0 .. wb-1 ]
               ) [ 0 .. wa-1 ])
             ) 
           )
@@ -114,16 +113,16 @@ let wallace a b =
   
   (* optimise all current weights at current reduction layer *)
   let optimise_layer weights =
-    let weights_next = map (fun w -> optimise_weight w [] []) weights in
+    let weights_next = List.map (fun w -> optimise_weight w [] []) weights in
     (* merge the new weight lists *)
-    let wc, wn = unzip weights_next in
+    let wc, wn = List.unzip weights_next in
     let wc, wn = wc @ [ [] ], [] :: wn in
-    let weights = map2 (fun x y -> x @ y) wc wn in
+    let weights = List.map2 (fun x y -> x @ y) wc wn in
     weights in
 
   (* recursively optimise until all weights have 2 or less wires *)
   let rec optimise w = 
-    let max_wires = fold_left (fun a l -> if a < length l then length l else a) 0 w in
+    let max_wires = List.fold (fun a l -> if a < List.length l then List.length l else a) 0 w in
     if max_wires <= 2 then w
     else optimise (optimise_layer w) in
     
@@ -139,7 +138,7 @@ let dadda a b =
     match w with
     | a::b::c::tl -> let c,s = fa a b c in optimise_weight opt2 prev tl (s::x) (c::xn)
     | a::b::tl -> 
-      if opt2 (length x + prev) then
+      if opt2 (List.length x + prev) then
         let c,s = ha a b in
         optimise_weight opt2 prev tl (s::x) (c::xn)
       else
@@ -150,19 +149,19 @@ let dadda a b =
   (* optimise all current weights at current reduction layer *)
   let optimise_layer optimise_weight weights =
     let _, weights_next = 
-      fold_left (fun (carry, wl) w -> 
+      List.fold (fun (carry, wl) w -> 
         let w,wn = optimise_weight carry w [] [] in
-        length wn, wl @ [(w, wn)]
+        List.length wn, wl @ [(w, wn)]
       ) (0,[]) weights in
     (* merge the new weight lists *)
-    let wc, wn = unzip weights_next in
+    let wc, wn = List.unzip weights_next in
     let wc, wn = wc @ [ [] ], [] :: wn in
-    let weights = map2 (fun x y -> x @ y) wc wn in
+    let weights = List.map2 (fun x y -> x @ y) wc wn in
     weights in
 
   (* recursively optimise until all weights have 2 or less wires *)
   let rec optimise w = 
-    let max_wires = fold_left (fun a l -> if a < length l then length l else a) 0 w in
+    let max_wires = List.fold (fun a l -> if a < List.length l then List.length l else a) 0 w in
     match max_wires with
     | 0 | 1 | 2 -> w
     | 3 -> optimise (optimise_layer (optimise_weight opt2_2) w) 

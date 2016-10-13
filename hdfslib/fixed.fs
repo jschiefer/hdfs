@@ -527,9 +527,9 @@ type UFixed =
 
     (* Mux a list of UFixed.  Format of each element may differ.  Rounding and overflow modes are propogated from first element in list. *)
     member x.mux (l : UFixed list) =
-      let hd = List.hd l
-      let high = List.fold_left (fun a (x : UFixed) -> max a x.high) (hd).high l
-      let low = List.fold_left (fun a (x : UFixed) -> min a x.low) (hd).low l
+      let hd = List.head l
+      let high = List.fold (fun a (x : UFixed) -> max a x.high) (hd).high l
+      let low = List.fold (fun a (x : UFixed) -> min a x.low) (hd).low l
       let r = range high low
       UFixed.to_UFixed ((x.signal.mux (List.map (fun (x : UFixed) -> (x.resize r).signal) l)), (-low), hd.round, hd.overflow)
       
@@ -1009,7 +1009,7 @@ type SFixed =
 
     (* Mux a list of SFixed.  Format of each element may differ.  Rounding and overflow modes are propogated from first element in list. *)
     member x.mux (l : SFixed list) =
-      let hd = List.hd l
+      let hd = List.head l
       let range = Range.union (List.map (fun (x : SFixed) -> x.range) l)
       SFixed.to_SFixed ((x.signal.mux (List.map (fun (x : SFixed) -> (x.resize_to range).signal) l)), range.fixedPoint, hd.round, hd.overflow)
       
@@ -1021,7 +1021,7 @@ type SFixed =
     // ////////////////////////////////////////////////////////
     
     member x.b_if((on_true : Behave list), (on_false : Behave list)) = x.signal.b_if (on_true, on_false)
-    member x.b_if on_true on_false = x.b_if(on_true, on_false)
+    // member x.b_if on_true on_false = x.b_if(on_true, on_false)
 
     member x.b_switch (cases : (Signal * Behave list) list) = x.signal.b_switch cases
     

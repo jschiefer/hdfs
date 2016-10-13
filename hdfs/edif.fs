@@ -93,7 +93,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
       )
     | _ -> failwith "Expecting instantiation"
   in
-  ignore (List.fold_left (fun set i -> write_cells set i) Set.empty circuit.Inst);
+  ignore (List.fold (fun set i -> write_cells set i) Set.empty circuit.Inst);
   os ("  )\n");
   
   (* top level circuit *)
@@ -127,7 +127,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
   
   let find_inst_port_name uid ports = 
     let found, name = 
-      List.fold_left (fun (found,n) (port_name, (port_signal:Signal)) -> 
+      List.fold (fun (found,n) (port_name, (port_signal:Signal)) -> 
         if found then found, n
         else if port_signal.uid = uid then (true, port_name)
         else (false, n)
@@ -178,7 +178,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
       set
     
   and write_nets set s = 
-    List.fold_left (fun set (s:PortRef) -> 
+    List.fold (fun set (s:PortRef) -> 
       match s with
       | NetRef _ | InstRefOut _ -> write_net set s
       | InstRefIn(n',s') -> 

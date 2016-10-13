@@ -22,10 +22,11 @@
 /// and used by the netlist generators and simulator among other things.<P>
 module DigitalLogic.Circuit
 
+open System
 open DigitalLogic.Numeric
 open DigitalLogic.Signal
-open List
-open Big_int
+
+type BigInt = bigint
 
 (** ***********************************************************)
 
@@ -99,7 +100,7 @@ let rec visit_signal set prefn postfn arg (signal : Signal) =
       arg, set
     | Signal_mux      (a,w,sel,d) -> 
       let arg = prefn arg signal in
-      let arg,set = fold_left (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) (sel::d) in
+      let arg,set = List.fold (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) (sel::d) in
       let arg = postfn arg signal in
       arg, set
     | Signal_select   (a,hi,lo,s) -> 
@@ -109,51 +110,51 @@ let rec visit_signal set prefn postfn arg (signal : Signal) =
       arg, set
     | Signal_reg      (a,w,clk,rst,rstval,ena,d) -> 
       let arg = prefn arg signal in
-      let arg,set = fold_left (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) [ clk; rst; rstval; ena; d ] in
+      let arg,set = List.fold (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) [ clk; rst; rstval; ena; d ] in
       let arg = postfn arg signal in
       arg, set
     | Signal_mem      (a,dw,aw,size,clk,w,we,d,r) -> 
       let arg = prefn arg signal in
-      let arg,set = fold_left (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) [ clk; w; we; d; r ] in
+      let arg,set = List.fold (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) [ clk; w; we; d; r ] in
       let arg = postfn arg signal in
       arg, set 
     | Signal_behave   (a,w,b,d) -> 
         let arg = prefn arg signal in
-        let arg,set = fold_left (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) d in
+        let arg,set = List.fold (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) d in
         let arg = postfn arg signal in
         arg, set 
     | Signal_inst     (a,n,m,g,io,i,o) -> 
         let arg = prefn arg signal in
-        let arg,set = fold_left (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) (map snd (i@io)) in
+        let arg,set = List.fold (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) (List.map snd (i@io)) in
         let arg = postfn arg signal in
         arg, set 
 #if INST2
     | Signal_inst2    (a,s,g,io,i,o) -> 
         let arg = prefn arg signal in
         let arg,set = fold_left (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) (map snd (i@io)) in
-        let arg = postfn arg signal in
+        let arg = postfn arg signal ing
         arg, set 
 #endif
     | Signal_tri      (a,w,d) -> 
       let arg = prefn arg signal in
-      let arg,set = fold_left (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) ((map fst d) @ (map snd d)) in
+      let arg,set = List.fold (fun (arg,set) s -> visit_signal set prefn postfn arg s) (arg,set) ((List.map fst d) @ (List.map snd d)) in
       let arg = postfn arg signal in
       arg, set
 
 (** Visit all signals in the given list (typically a list of output signals).  The argument is "folded" between signals *)
 let visit_signal_list prefn postfn arg signals =
-  let arg, set = fold_left 
+  let arg, set = List.fold 
     (fun (arg,set) signal -> visit_signal set prefn postfn arg signal) (arg,Set.empty) signals in
   arg
 
 (** Visit all signals in the given list (typically a list of output signals).  The argument is applied to each call. *)
 let visit_signal_map prefn postfn arg_def signals =
-  let args, _ = fold_left 
+  let args, _ = List.fold 
     (fun (args,set) signal -> 
       let arg,set = visit_signal set prefn postfn arg_def signal in
       (arg::args,set)
     ) ([],Set.empty) signals in
-  rev args
+  List.rev args
 
 (** default function argument for the visit_ functions.  Returns the argument. *)
 let def_arg arg signal = arg 
@@ -163,7 +164,7 @@ let def_signal arg signal = signal
 (* ************************************************************)
 
 (** Debug.  Prints the behavioural assignment tree *)
-let rec print_behave f i nodes = iter (print_behave_node f i) nodes
+let rec print_behave f i nodes = List.iter (print_behave_node f i) nodes
 (** Debug.  Prints the behavioural assignment tree node *)
 and print_behave_node (f:System.IO.TextWriter) i node = 
   let os (s:string) = f.Write(s) in
@@ -177,7 +178,7 @@ and print_behave_node (f:System.IO.TextWriter) i node =
   )
   | B_switch(cond, cases) -> (
     os (i ^ "b_switch (" ^ cond.name ^ ") [\n");
-    iter (fun (idx, statements) -> 
+    List.iter (fun (idx, statements) -> 
       os (i ^ " b_case (constb \"" ^ string_of_const idx ^ "\") [\n");
       print_behave f (i^"  ") statements;
       os (i ^ " ];\n");
@@ -195,7 +196,7 @@ and print_behave_node (f:System.IO.TextWriter) i node =
 /// but not returned
 let scheduler dependants remaining computed =
   let debug = true in
-  let set_add_list set l = List.fold_left (fun set (signal : Signal) -> Set.add (signal.uid) set) set l in
+  let set_add_list set l = List.fold (fun set (signal : Signal) -> Set.add (signal.uid) set) set l in
 
   let rec scheduler remaining computed computed_set = 
     let failed() = 
@@ -204,7 +205,7 @@ let scheduler dependants remaining computed =
         os "Remaining\n";
         List.iter (fun s -> 
           os (string_of_signal s ^ " - ");
-          iter (fun s -> os (string_of_signal s ^ " ")) (dependants s);
+          List.iter (fun s -> os (string_of_signal s ^ " ")) (dependants s);
           os "\n";
         ) remaining;
         os "Computed\n";
@@ -238,9 +239,9 @@ let connected_nodes_map outputs =
         | Some(to_uid_set) -> Map.add from_uid (Set.add to_uid to_uid_set) map
         | None -> Map.add from_uid (Set.singleton to_uid) map
       in
-      let map = List.fold_left (fun map (s:Signal) -> add s.uid signal.uid map) map signal.dependants in
+      let map = List.fold (fun map (s:Signal) -> add s.uid signal.uid map) map signal.dependants in
       connect_nodes (set,map) signal.dependants 
-  and connect_nodes (set,map) signals  = List.fold_left connect_node (set,map) signals in
+  and connect_nodes (set,map) signals  = List.fold connect_node (set,map) signals in
   let set, map = connect_nodes (Set.empty, Map.empty) outputs in
   Map.mapi (fun _ s -> (Set.size s, Set.to_list s)) map
 
@@ -300,13 +301,13 @@ type Circuit = Circuit of
     (** Creates a circuit datatype given it's inouts and outputs.  The analysis performed here is used for code generation simulation and general validity checks. *)
     static member Create(inouts, outputs) = 
       (* outputs must be assigned wires with names *)
-      iter (fun (x:Signal) -> 
+      List.iter (fun (x:Signal) -> 
         if not (x.IsWire) then failwith "Circuit outputs must be wires"
         else if wire_name x = "" then failwith "Circuit outputs must be named"
         else if (wire_connection x).IsEmpty then failwith ("Output " ^ wire_name x ^ " should be driven by something")
       ) (outputs @ inouts);
-      let output_set       = fold_left (fun set (s : Signal) -> Set.add (s.uid) set) Set.empty outputs in
-      let inout_set        = fold_left (fun set (s : Signal) -> Set.add (s.uid) set) Set.empty inouts in
+      let output_set       = List.fold (fun set (s : Signal) -> Set.add (s.uid) set) Set.empty outputs in
+      let inout_set        = List.fold (fun set (s : Signal) -> Set.add (s.uid) set) Set.empty inouts in
       let is_output (signal : Signal) = Set.mem (signal.uid) output_set in
       let is_inout (signal : Signal)  = Set.mem (signal.uid) inout_set in
 
@@ -316,7 +317,7 @@ type Circuit = Circuit of
         (fun (inps,wires,regs,mems,nodes,consts,inst,inst2,bits) (signal : Signal) -> 
           let max_bits() = if (signal.width) > bits then (signal.width) else bits in
           let dependants = signal.dependants in
-          iter (fun x -> if (is_output x) then failwith "Circuit outputs may not be read by other logic") dependants;
+          List.iter (fun x -> if (is_output x) then failwith "Circuit outputs may not be read by other logic") dependants;
           match signal.signal with
           | Signal_empty -> 
             (inps, wires, regs, mems, nodes, consts, inst, inst2, max_bits())
@@ -329,7 +330,7 @@ type Circuit = Circuit of
           | Signal_mem(_,_,_,_,clk,_,_,_,_) -> 
             (inps, wires, regs, signal::mems, nodes, consts, inst, inst2, max_bits())
           | Signal_inst(a,n,m,g,io,i,o) ->
-            let add_list l set = fold_left (fun set a -> Set.add a set) set l in
+            let add_list l set = List.fold (fun set a -> Set.add a set) set l in
             (inps, wires, regs, mems, nodes, consts, signal::inst, inst2, max_bits())
 #if INST2
           | Signal_inst2(a,n,g,io,i,o) ->
@@ -340,7 +341,7 @@ type Circuit = Circuit of
             (inps, wires, regs, mems, nodes, signal::consts, inst, inst2, max_bits())
           | _ -> 
             (inps, wires, regs, mems, signal::nodes, consts, inst, inst2, max_bits())
-        ) def_arg ([],[],[],[],[],[],[],[],0) (map (fun o -> wire_connection o) outputs) in
+        ) def_arg ([],[],[],[],[],[],[],[],0) (List.map (fun o -> wire_connection o) outputs) in
 
         inputs, wires, regs, mems, nodes, consts, inst, inst2, bits
       in
@@ -349,15 +350,15 @@ type Circuit = Circuit of
       let inputs, wires, regs, mems, nodes, consts, inst, inst2, max_bit_width = signals in
 
       (* inputs must be unassigned wires with names *)
-      iter (fun (x:Signal) -> 
+      List.iter (fun (x:Signal) -> 
         if not (x.IsWire) then failwith "Circuit inputs must be wires"
         else if wire_name x = "" then failwith "Circuit inputs must be named"
         else if not (wire_connection x).IsEmpty then failwith ("Input " ^ wire_name x ^ " must not be connected to anything")
       ) inputs;
 
       let all_map = 
-        fold_left (fun map (s : Signal list) ->
-          fold_left (fun map (s:Signal) -> Map.add s.uid s map) map s
+        List.fold (fun map (s : Signal list) ->
+          List.fold (fun map (s:Signal) -> Map.add s.uid s map) map s
         ) Map.empty [ inputs; outputs; inouts; wires; regs; mems; nodes; consts; inst; inst2 ] in
         
       let uid (s:Signal) = s.uid in
@@ -413,7 +414,7 @@ let find_inputs outputs =
         then signal::inputs
         else inputs
       | _ -> inputs
-    ) def_arg [] (map (fun o -> wire_connection o) outputs) 
+    ) def_arg [] (List.map (fun o -> wire_connection o) outputs) 
 
 (** Run a circuit generator to create a file. *)
 let write_file fn path n ext outputs = 

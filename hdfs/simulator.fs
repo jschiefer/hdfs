@@ -27,7 +27,6 @@ open DigitalLogic.Numeric.ArrayBits
 open DigitalLogic.Numeric.ResizingArray
 open DigitalLogic.Circuit
 open DigitalLogic.Signal
-open List
 
 (*--------------------------------------------------------------------------------------------*)
 (*--------------------------------------------------------------------------------------------*)
@@ -300,9 +299,9 @@ begin
       | _ -> failwith "Expecting a memory"
     in
 
-    let data_map = fold_left make_data_map Map.empty (inputs @ outputs @ wires @ regs @ mems @ logic) in
-    let reg_map = fold_left make_data_map Map.empty regs in
-    let mem_map = fold_left make_mem_map Map.empty mems in
+    let data_map = List.fold make_data_map Map.empty (inputs @ outputs @ wires @ regs @ mems @ logic) in
+    let reg_map = List.fold make_data_map Map.empty regs in
+    let mem_map = List.fold make_mem_map Map.empty mems in
 
     let find (signal : Signal) = Map.find signal.uid data_map in
     let find_reg (signal : Signal) = Map.find signal.uid reg_map in
@@ -310,8 +309,8 @@ begin
     
     (* create functions which map behavioural code to assigns guarded by if and switch statements. *)
     let rec behave_tasks (tgt_data : ArrayBits) code = 
-      let code = map (behave_task tgt_data) code in
-      (fun () -> iter (fun x -> x()) code) 
+      let code = List.map (behave_task tgt_data) code in
+      (fun () -> List.iter (fun x -> x()) code) 
     and behave_task tgt_data code = 
       match code with
       | B_if(cond, on_true, on_false) -> 
@@ -327,7 +326,7 @@ begin
         let width_of_cond = width cond in
         let data_of_cond = find cond in
         (* map of case index constants to the tasks to execute. *)
-        let case_tasks_map = fold_left (fun map (cond_match, exprs) -> 
+        let case_tasks_map = List.fold (fun map (cond_match, exprs) -> 
           let data_of_cond_match = ArrayBits.of_string (string_of_const cond_match) in
           let code_of_case = behave_tasks tgt_data exprs in
           Map.add data_of_cond_match code_of_case map
@@ -354,7 +353,7 @@ begin
         let d = find s in
         "[" ^ n ^ " - " ^ d.to_string ^ "]"
       in
-      if trace then (fun () -> (str ^ " " ^ fmt s ^ " : " ^ (fold_strings " " (map fmt s.dependants))))
+      if trace then (fun () -> (str ^ " " ^ fmt s ^ " : " ^ (fold_strings " " (List.map fmt s.dependants))))
       else (fun () -> "")
     in
     
@@ -400,7 +399,7 @@ begin
         let max_mux = 31 in (* mux's are built with arrays if select.width < max_mux, otherwise with a map *)
         let target = (find signal) in
         let select = (find sel) in
-        let lookup = f_mux max_mux select.width (map (fun d -> find d) dlist) in
+        let lookup = f_mux max_mux select.width (List.map (fun d -> find d) dlist) in
         Some(trace "mux", (fun () -> (f_copy target (lookup select))() ))
         
       (* Selection.  Make some effort to identify special cases here as this is a common operation *)
@@ -510,14 +509,14 @@ begin
     *)
     
     let reset = 
-      let f = (fun () -> iter (fun x -> x()) reg_resets) in
+      let f = (fun () -> List.iter (fun x -> x()) reg_resets) in
       if trace then
         (fun () -> printf "********* RESET\n"; f())
       else f
     in
     
     let cycle = 
-      let f = (fun () -> iter (fun x -> x()) 
+      let f = (fun () -> List.iter (fun x -> x()) 
         (input_tasks @ scheduled_tasks @ output_tasks @    (* Combinatorial logic *)
          mem_write_tasks @ reg_tasks @ reg_update_tasks))  (* Sequential logic *)
       in
@@ -528,10 +527,10 @@ begin
     in
     
     let mk_port (s:Signal) = { port_uid = s.uid; port_name = s.name; port_data = find s } in
-    let inputs  = map mk_port inputs in
-    let wires = (filter (fun s -> (wire_connection s <> Signal.empty) && (wire_name s <> "")) wires) in
-    let wires   = map mk_port wires in
-    let outputs = map mk_port outputs in
+    let inputs  = List.map mk_port inputs in
+    let wires = (List.filter (fun s -> (wire_connection s <> Signal.empty) && (wire_name s <> "")) wires) in
+    let wires   = List.map mk_port wires in
+    let outputs = List.map mk_port outputs in
     {
       sim_circuit  = circuit;
       sim_reset    = reset;
@@ -539,8 +538,8 @@ begin
       sim_inputs   = inputs;
       sim_wires    = wires;
       sim_outputs  = outputs;
-      sim_port_map = fold_left (fun map (s:Port) -> Map.add s.uid s map) Map.empty (inputs @ wires @ outputs);
-      sim_name_map = fold_left (fun map (s:Port) -> Map.add s.name s.uid map) Map.empty (inputs @ wires @ outputs);
+      sim_port_map = List.fold (fun map (s:Port) -> Map.add s.uid s map) Map.empty (inputs @ wires @ outputs);
+      sim_name_map = List.fold (fun map (s:Port) -> Map.add s.name s.uid map) Map.empty (inputs @ wires @ outputs);
       sim_data_map = data_map;
       sim_reg_map  = reg_map;
       sim_mem_map  = mem_map;
@@ -559,18 +558,18 @@ begin
       sim_cycle    = 
         (fun () -> 
           (* copy inputs from s0 to s1 *)
-          iter (fun (s:Port) -> try (f_copy (s1.port s.name).port_data s.port_data)() with _ -> ()) s0.inputs;
+          List.iter (fun (s:Port) -> try (f_copy (s1.port s.name).port_data s.port_data)() with _ -> ()) s0.inputs;
           s0.cycle; 
           s1.cycle;
           (* Compare s0 wire with s1 *)
           let different s0 s1 = (ArrayBits.eq s0.port_data s1.port_data).data.[0] = 0ul in
-          iter (fun (s0:Port) -> 
+          List.iter (fun (s0:Port) -> 
             try 
               let s1 = s1.port s0.name in
               if different s0 s1 then sim_error_fn s0 s1 
             with _ -> ()) s0.wires;
           (* Compare s0 outputs with s1 *)
-          iter (fun (s0:Port) -> 
+          List.iter (fun (s0:Port) -> 
             try 
               let s1 = s1.port s0.name in
               if different s0 s1 then sim_error_fn s0 s1 
@@ -583,7 +582,7 @@ begin
   let record_ports (s0:Simulator) (ports:Port list) enable = 
     let cycle = ref 0 in
     let mk_ra (p:Port) = ResizingArray.create 32 (ArrayBits.make p.width), p in
-    let ra_ports = map mk_ra ports in
+    let ra_ports = List.map mk_ra ports in
     let cycle () = 
       let record ((ra:ResizingArray<ArrayBits>), (p:Port)) = ra.[!cycle] <- ArrayBits.copy p.port_data in
       (* cycle *)
@@ -591,7 +590,7 @@ begin
       if !enable then
       begin
         (* record ports *)
-        iter record ra_ports;
+        List.iter record ra_ports;
         (* Increment cycle *)
         cycle := !cycle + 1
       end

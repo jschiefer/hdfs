@@ -304,8 +304,8 @@ module Signal = begin
     let cnt = ref 100 in (* "global" signals use ids < 100.  Avoids potential clashes if reset *)
     let prefix = "hdfs_" in
     let prefix_len = prefix.Length in
-    let h = Hashtbl.create 128 in
-    (fun() -> cnt := 100; Hashtbl.clear h), 
+    let h = Hashtable(128) in
+    (fun() -> cnt := 100; h.Clear()), 
     (fun() -> cnt := !cnt+1; !cnt),
     (fun n -> prefix ^ n),
     (fun (n:string) ->
@@ -315,13 +315,14 @@ module Signal = begin
       );
       let rec mangle n = 
         let cnt = 
-          try Hashtbl.find h n
+          try h.[n] :?> int
           with _ -> 0 in
         match cnt with
-        | 0 -> Hashtbl.add h n 1; n
+        | 0 -> h.Add(n, 1); n
         | x -> 
           let nn = n ^ "_" ^ (string x) in
-          Hashtbl.replace h n (x+1); 
+          h.Remove(n);
+          h.Add(n, (x + 1));
           mangle nn in  (* it could be that this name also needs mangling, so try again.  This'll produce some funny names, but it's relatively simple *)
       mangle n
     )
@@ -1071,7 +1072,7 @@ module Signal = begin
         let cases, opt = List.fold (fun (cur,opt) case -> match case with _,[] -> (cur,true) | _ -> (case::cur,opt)) ([],opt) cases in
         let cases = List.rev cases in
         (* recursively optimise *)
-        let cases, opts = List.unzip (map (fun (i,case) -> let n,o = optimise_list opt case in (i,n),o) cases) in 
+        let cases, opts = List.unzip (List.map (fun (i,case) -> let n,o = optimise_list opt case in (i,n),o) cases) in 
         B_switch(cond, cases), List.fold (||) opt opts
       | B_assign(target, expr) -> 
         node, opt
@@ -1477,7 +1478,7 @@ module Signal = begin
     member cond.b_unless on_false = b_if cond [] on_false
     
     (** Behavioral if/else.  This overloaded version comes in curried form since writing the uncurried form requires awkward syntax. *)
-    member cond.b_if on_true on_false = b_if cond on_true on_false
+    // member cond.b_if on_true on_false = b_if cond on_true on_false
     (** Behavioral switch *)
     member cond.b_switch cases = b_switch cond cases
     (** Behavioral case *)
@@ -1566,8 +1567,9 @@ module Signal = begin
       
       member x.Item
         with get(n:string) = 
+            let assoc k = List.tryFind(fst >> (=) k) in
           let ports = x.Inputs @ x.Outputs @ x.Inouts in
-          List.assoc n ports
+          assoc n ports;
           
       (** Sets name of component instantiation *)
       static member (--) ((s : Inst), n) = 

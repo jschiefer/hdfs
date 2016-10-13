@@ -21,6 +21,7 @@
 (** HDFS release 0.1 version of the simulator.  *)
 module DigitalLogic.SimulatorV01
 
+open System
 open System.Diagnostics;
 open DigitalLogic.Circuit
 open DigitalLogic.Signal
@@ -600,8 +601,8 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
       failwith "Tristates not supported in simulation"
   in
 
-  let data_map = List.fold_left make_data_map Map.empty (inputs @ outputs @ wires @ regs @ mems @ logic) in
-  let seq_data_map = List.fold_left make_data_map Map.empty regs in
+  let data_map = List.fold make_data_map Map.empty (inputs @ outputs @ wires @ regs @ mems @ logic) in
+  let seq_data_map = List.fold make_data_map Map.empty regs in
   
   let find (signal : Signal) = Map.find signal.uid data_map in
   let find_seq (signal : Signal) = Map.find signal.uid seq_data_map in
@@ -615,7 +616,7 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
      The functions when executed return an indication of whether the code was executed *)
   let rec behave_tasks tgt_data code = 
     let code = List.map (behave_task tgt_data) code in
-    (fun () -> List.fold_left (fun b x -> x() || b) false code) 
+    (fun () -> List.fold (fun b x -> x() || b) false code) 
   and behave_task tgt_data code = 
     match code with
     | B_if(cond, on_true, on_false) -> (
@@ -631,7 +632,7 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
       let width_of_cond = width cond in
       let data_of_cond = find cond in
       (* map of case index constants to the tasks to execute. *)
-      let case_tasks_map = List.fold_left (fun map (cond_match, exprs) -> 
+      let case_tasks_map = List.fold (fun map (cond_match, exprs) -> 
         let data_of_cond_match = d.create (width cond_match) in
         d.set_const data_of_cond_match (string_of_const cond_match);
         let code_of_case = behave_tasks tgt_data exprs in
@@ -681,7 +682,7 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
       let data = find signal in
       let sel = find sel in
       let opts = List.mapi (fun i x -> i, find x) dlist in
-      let opts_map = List.fold_left (fun map (i,x) -> Map.add i x map) Map.empty opts in
+      let opts_map = List.fold (fun map (i,x) -> Map.add i x map) Map.empty opts in
       (fun () -> 
         let idx = (min (d.to_int sel) (len-1)) in
         let dmux = (Map.find idx opts_map) in
