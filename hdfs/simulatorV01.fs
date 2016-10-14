@@ -959,8 +959,8 @@ let create_dual_sim (dcfg : 'a sim_data_t) sim0 sim1 num_errors =
     ),
     (* ports *)
     in_0,
-    List.sort compare_name (wire_0 @ wire_1),
-    List.sort compare_name (out_0 @ out_1)
+    List.sortWith compare_name (wire_0 @ wire_1),
+    List.sortWith compare_name (out_0 @ out_1)
   )
 
 (** creates a dual sim object for int simulations *)

@@ -147,7 +147,7 @@ let write (f:System.IO.TextWriter) name (circuit : Circuit) =
         match x.signal with
         | Signal_wire(_) ->
         begin
-          match Map.tryfind x.uid circuit.FanoutMap with
+          match Map.tryFind x.uid circuit.FanoutMap with
           | None -> [ NetRef(x) ] (* an output *)
           | Some(_,f) -> resolve_signals x.uid (List.map (fun x -> circuit.find x) f)
         end

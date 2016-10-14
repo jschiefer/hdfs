@@ -218,7 +218,7 @@ let scheduler dependants remaining computed =
       List.rev computed
     else
       let is_computed (signal : Signal) = Set.contains (signal.uid) computed_set in
-      let is_ready (signal : Signal) = List.for_all is_computed (List.filter ((<>) Signal.empty) (dependants signal)) in
+      let is_ready (signal : Signal) = List.forall is_computed (List.filter ((<>) Signal.empty) (dependants signal)) in
       let ready, not_ready = List.partition is_ready remaining in
       if ready = [] then failed();
       scheduler not_ready (ready @ computed) (set_add_list computed_set ready)
@@ -243,7 +243,7 @@ let connected_nodes_map outputs =
       connect_nodes (set,map) signal.dependants 
   and connect_nodes (set,map) signals  = List.fold connect_node (set,map) signals in
   let set, map = connect_nodes (Set.empty, Map.empty) outputs in
-  Map.mapi (fun _ s -> (Set.size s, Set.to_list s)) map
+  Map.mapi (fun _ s -> (Set.size s, Set.toList s)) List.map
 
 (* *********************************************************** *)
 
@@ -364,10 +364,10 @@ type Circuit = Circuit of
       let uid (s:Signal) = s.uid in
       
       Circuit(
-        sort (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) inputs,
-        sort (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) outputs,
-        sort (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) inouts,
-        sort (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) wires,
+        List.sortWith (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) inputs,
+        List.sortWith (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) outputs,
+        List.sortWith (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) inouts,
+        List.sortWith (fun (s0 : Signal) (s1 : Signal) -> compare (s0.uid) (s1.uid)) wires,
         regs,mems,nodes,consts,inst,inst2,
         Set.ofList (List.map uid inputs),
         Set.ofList (List.map uid outputs),

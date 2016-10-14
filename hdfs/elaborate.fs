@@ -24,6 +24,7 @@ module DigitalLogic.Elaborate
 open DigitalLogic
 open Circuit
 open Signal
+open System
 open System.Reflection
 
 exception Dynload_method of MethodInfo
@@ -101,7 +102,7 @@ let rec elaborate circuit circuits paths =
         let a = signal_incr_uid() in 
         let ii, set = renumber_nodes set (List.map snd i) in
         let ioo, set = renumber_nodes set (List.map snd io) in
-        su (Signal_inst(a,n,m,g, List.map2 (fun i ii -> fst i, ii) io ioo, map2 (fun i ii -> fst i, ii) i ii, o)), set
+        su (Signal_inst(a,n,m,g, List.map2 (fun i ii -> fst i, ii) io ioo, List.map2 (fun i ii -> fst i, ii) i ii, o)), set
     | Signal_tri      (a,w,d) -> 
         let a = signal_incr_uid() in 
         let oe = List.map fst d in

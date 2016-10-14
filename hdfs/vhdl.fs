@@ -128,7 +128,7 @@ port (
       else
         s.name ^ "(" ^ string hi ^ " downto " ^ string lo ^ ")"
     | Signal_mux      (a,w,sel,d) -> (* only for simple 1 bit select, two state mux's *)
-        ((hd d).name ^ " when " ^ sel.name ^ " = '0' else " ^ (hd (tl d)).name)
+        ((List.head d).name ^ " when " ^ sel.name ^ " = '0' else " ^ (List.head (List.tail d)).name)
     | Signal_reg      (_) -> failwith "unexpected reg"
     | Signal_mem      (_) -> failwith "unexpected mem"
     | Signal_behave   (_) -> failwith "unexpected behave"
@@ -140,13 +140,13 @@ port (
   in
   
   let is_process (x : Signal) = match x.signal with 
-    | Signal_mux (a,w,sel,d) when (width sel <> 1) || (length d <> 2) -> true
+    | Signal_mux (a,w,sel,d) when (width sel <> 1) || (List.length d <> 2) -> true
     | Signal_reg (_)
     | Signal_behave (_)
     | Signal_mem (_) -> true
     | _ -> false in
 
-  let rec print_behave t i nodes = iter (print_behave_node t i) nodes
+  let rec print_behave t i nodes = List.iter (print_behave_node t i) nodes
   and print_behave_node t i node = 
     match node with
     | B_if(cond, on_true, on_false) -> (
@@ -158,7 +158,7 @@ port (
     )
     | B_switch(cond, cases) -> (
       os (i ^ "case " ^ cond.name ^ " is\n");
-      iter (fun (idx, statements) -> 
+      List.iter (fun (idx, statements) -> 
         if width cond = 1 then os (i ^ " when '" ^ string_of_const idx ^ "' =>\n")
         else os (i ^ " when \"" ^ string_of_const idx ^ "\" =>\n");
         print_behave t (i^"  ") statements;
@@ -207,7 +207,7 @@ port (
       )
 
     | Signal_mux(a,w,sel,d) -> (
-      let num_cases = length d in
+      let num_cases = List.length d in
       let rec cases n (d : Signal list) = 
         match d with 
         | [] -> failwith "empty mux"
@@ -218,7 +218,7 @@ port (
           cases (n+1) tl
         )
       in
-      let triggers = map (fun (x : Signal) -> x.name) (filter (fun (s:Signal) -> not s.IsConst) (unique_signal_list d)) in
+      let triggers = List.map (fun (x : Signal) -> x.name) (List.filter (fun (s:Signal) -> not s.IsConst) (unique_signal_list d)) in
       let triggers = fold_strings ", " ((sel.name)::triggers) in    (* XXX the sel signal _must not_ be constant *)
       os (" process ( " ^ triggers ^ " ) is begin\n  case " ^ sel.name ^ " is\n");
       cases 0 d;
@@ -226,7 +226,7 @@ port (
     )
     
     | Signal_behave(a,w,b,d) -> (
-      let triggers = map (fun (x : Signal) -> x.name) (filter (fun (d:Signal) -> not d.IsConst) d) in
+      let triggers = List.map (fun (x : Signal) -> x.name) (List.filter (fun (d:Signal) -> not d.IsConst) d) in
       let trigger_string = fold_strings ", " triggers in
       if triggers = [] then
         os (" process is begin\n")
@@ -257,11 +257,11 @@ port (
       (* XXXX what is going on here?  Constants fail...but they are a part of the circuit.  EH? 
          If I make them part of the ciruit...what happen? Lets try.  It'll need thinking about because outputs/inouts are different. *)
       let connect c = fst c ^ "=>" ^ (if is_in_circuit (snd c) then (snd c).name else "open") in
-      let generics = map (fun (n,t,d) -> 
+      let generics = List.map (fun (n,t,d) -> 
           match d with | None -> "" | Some d -> n ^ "=>" ^ (string_of_generic_data t d)
         ) g in
       let generics = fold_strings ", " generics in
-      let ports = (map connect i) @ (map connect o) @ (map connect io) in
+      let ports = (List.map connect i) @ (List.map connect o) @ (List.map connect io) in
       os (" the_" ^ signal.name ^ " : " ^ n ^ 
         (if generics <> "" then " generic map (" ^ generics ^ ")" else "") ^ 
         " port map (" ^ (fold_strings ", " ports) ^ ");\n")
@@ -314,10 +314,10 @@ port (
       else (
         let port_decl str signal = (" " ^ signal_decl "in" signal ^ ";\n") in
         let port_map = fold_strings ";\n" 
-          ((map (fun c -> "  " ^ signal_named "in"  (fst c) (snd c)) i) @ 
-           (map (fun c -> "  " ^ signal_named "out" (fst c) (snd c)) o) @ 
-           (map (fun c -> "  " ^ signal_named "inout" (fst c) (snd c)) io)) in
-        let generic_map = fold_strings ";\n" (map string_of_generic g) in
+          ((List.map (fun c -> "  " ^ signal_named "in"  (fst c) (snd c)) i) @ 
+           (List.map (fun c -> "  " ^ signal_named "out" (fst c) (snd c)) o) @ 
+           (List.map (fun c -> "  " ^ signal_named "inout" (fst c) (snd c)) io)) in
+        let generic_map = fold_strings ";\n" (List.map string_of_generic g) in
         os (" component " ^ n ^ " \n");
         if g <> [] then (
           os ("  generic (\n");
@@ -384,7 +384,7 @@ port (
   let write_tristate (signal : Signal) = 
     match signal.signal with 
     | Signal_tri(a,w,d) ->
-      iter (fun ((oe : Signal),(d : Signal)) -> 
+      List.iter (fun ((oe : Signal),(d : Signal)) -> 
         os (" " ^ signal.name ^ " <= " ^ d.name ^ " when " ^ oe.name ^ " = '1' else " ^ 
           (if (width d) = 1 then "'Z'" else "(others=>'Z')") ^ ";\n")
       ) d
@@ -430,29 +430,29 @@ port (
       ) ^ ";\n")) mem_widths;
   
   os "\n -- components\n";
-  ignore (fold_left (fun set i -> write_component set i) Set.empty circuit.Inst);
+  ignore (List.fold (fun set i -> write_component set i) Set.empty circuit.Inst);
 #if INST2
   ignore (fold_left (fun set i -> write_component2 set i) Set.empty circuit.Inst2);
 #endif
   os "\n -- declarations\n";
-  iter write_const circuit.Constants;
-  iter write_decl circuit.Wires;
-  iter write_decl circuit.Logic;
-  iter write_decl circuit.Regs;
-  iter write_mem_decl circuit.Memories;
+  List.iter write_const circuit.Constants;
+  List.iter write_decl circuit.Wires;
+  List.iter write_decl circuit.Logic;
+  List.iter write_decl circuit.Regs;
+  List.iter write_mem_decl circuit.Memories;
   os ("\nbegin\n");
   os "\n -- logic \n";
-  iter write_nodes circuit.Logic;
-  iter write_nodes circuit.Regs;
-  iter write_nodes circuit.Memories;
-  iter write_inst circuit.Inst;
+  List.iter write_nodes circuit.Logic;
+  List.iter write_nodes circuit.Regs;
+  List.iter write_nodes circuit.Memories;
+  List.iter write_inst circuit.Inst;
   //iter write_inst2 circuit.Inst2;
   os "\n -- wire connections\n";
-  iter write_connections circuit.Wires;
+  List.iter write_connections circuit.Wires;
   os "\n -- outputs\n";
-  iter write_connections circuit.Outputs;
+  List.iter write_connections circuit.Outputs;
   os "\n -- inouts\n";
-  iter write_connections (filter (fun x -> not (wire_connection x).IsInst) circuit.Inouts);
+  List.iter write_connections (List.filter (fun x -> not (wire_connection x).IsInst) circuit.Inouts);
   
   os "\nend architecture;\n";
   
