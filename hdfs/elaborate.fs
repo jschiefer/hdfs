@@ -37,7 +37,7 @@ let failwith s = raise (Elaborate_error s)
 let load_circuit_from_dll path name = 
   try
     let assembly = Assembly.LoadFrom(path ^ name ^ ".dll") in
-    let typ = assembly.GetType(String.capitalize name) in
+    let typ = assembly.GetType(name.ToUpper()) in
     let methods = typ.GetMethods() in
     Some (Array.find (fun (m : MethodInfo) -> m.Name = name) methods)
   with 
@@ -129,7 +129,7 @@ let rec elaborate circuit circuits paths =
   (* look through the list of circuits for a match *)
   let find_circuit name = 
     try
-      let c = List.assoc name circuits in
+      let c = snd (List.find (fst >> (=) name) circuits) in
       Some(renumber_nodes c)
     with _ -> None
   in

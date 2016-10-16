@@ -49,7 +49,6 @@
     <Compile Include="signal.fs" />
     <Compile Include="circuit.fs" />
     <Compile Include="simulator.fs" />
-    <Compile Include="simulatorV01.fs" />
     <Compile Include="vhdl.fs" />
     <Compile Include="c.fs" />
     <Compile Include="edif.fs" />

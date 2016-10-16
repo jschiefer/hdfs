@@ -1567,7 +1567,7 @@ module Signal = begin
       
       member x.Item
         with get(n:string) = 
-            let assoc k = List.tryFind(fst >> (=) k) in
+          let assoc k = List.tryFind(fst >> (=) k) in
           let ports = x.Inputs @ x.Outputs @ x.Inouts in
           assoc n ports;
           

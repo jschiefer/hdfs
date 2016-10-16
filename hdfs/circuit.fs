@@ -243,7 +243,7 @@ let connected_nodes_map outputs =
       connect_nodes (set,map) signal.dependants 
   and connect_nodes (set,map) signals  = List.fold connect_node (set,map) signals in
   let set, map = connect_nodes (Set.empty, Map.empty) outputs in
-  Map.mapi (fun _ s -> (Set.size s, Set.toList s)) List.map
+  Map.map (fun _ s -> (Set.count s, Set.toList s)) map
 
 (* *********************************************************** *)
 
