@@ -358,11 +358,11 @@ type StateEnum =
       in
       {
         states = List.zip states codes;
-        state_var = b_reg clock reset (List.hd codes) enable state_width;
+        state_var = b_reg clock reset (List.head codes) enable state_width;
       }
     
     member x.signal_of_state str = 
-      try List.assoc str x.states 
+      try List.find (fst >> (=) str) x.states 
       with _ -> failwith ("Couldn't look up state " ^ str)
 
     member x.Item with get(state:string) = x.signal_of_state state

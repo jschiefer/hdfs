@@ -17,6 +17,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 *)
+module DigitalLogic.Circuits.Cordic_Ref
+
 
 let pi = 3.1415926535897932384626433832795 
 

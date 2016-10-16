@@ -541,7 +541,7 @@ type UFixed =
     // ////////////////////////////////////////////////////////
     
     member x.b_if((on_true : Behave list), (on_false : Behave list)) = x.signal.b_if (on_true, on_false)
-    member x.b_if on_true on_false = x.b_if(on_true, on_false)
+//    member x.b_if on_true on_false = x.b_if(on_true, on_false)
     
     member x.b_switch (cases : (Signal * Behave list) list) = x.signal.b_switch cases
     
