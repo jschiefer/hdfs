@@ -1,3 +1,6 @@
+namespace DigitalLogic.Numeric
+
+#nowarn "62"    // Using ^ for string concatenation
 #light "off"
 (*
   HDFS Digital Logic Hardware Design (HDFS.dll)
@@ -18,7 +21,6 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 *)
 
-namespace DigitalLogic.Numeric
 
 open System
 open Microsoft.FSharp.Core

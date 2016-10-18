@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "debugType": "portable",
+    "emitEntryPoint": false,
+    "compilerName": "fsc",
+    "compile": {
+      "includeFiles": [
+        "AssemblyInfo.fs",
+        "numeric.fs",
+        "signal.fs",
+        "circuit.fs",
+        "simulator.fs",
+        "vhdl.fs",
+        "c.fs",
+        "edif.fs",
+        "elaborate.fs",
+        "fsharp.fs",
+        "resources.fs",
+        "verilog.fs"
+      ]
+    }
+  },
+  "tools": {
+    "dotnet-compile-fsc":"1.0.0-preview2-*"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.1"
+        },
+        "Microsoft.FSharp.Core.netcore": "1.0.0-alpha-160629"
+      }
+    }
+  }
+}

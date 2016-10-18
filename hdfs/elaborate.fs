@@ -1,3 +1,7 @@
+(** Replace instantiations with circuits. *)
+module DigitalLogic.Elaborate
+
+#nowarn "62"    // Using ^ for string concatenation
 #light "off"
 (*
   HDFS Digital Logic Hardware Design (HDFS.dll)
@@ -17,9 +21,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 *)
-
-(** Replace instantiations with circuits. *)
-module DigitalLogic.Elaborate
 
 open DigitalLogic
 open Circuit

@@ -1,3 +1,6 @@
+module DigitalLogic.Circuit
+
+#nowarn "62"    // Using ^ for string concatenation
 #light "off"
 (*
   HDFS Digital Logic Hardware Design (HDFS.dll)
@@ -20,7 +23,6 @@
 
 /// <P>The circuit data type is constructed from from a list of circuit outputs (and optionally inouts)
 /// and used by the netlist generators and simulator among other things.<P>
-module DigitalLogic.Circuit
 
 open System
 open DigitalLogic.Numeric

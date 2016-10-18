@@ -1,3 +1,6 @@
+namespace DigitalLogi.Vhdlc
+
+#nowarn "62"    // Using ^ for string concatenation
 #light "off"
 (*
   HDFS Digital Logic Hardware Design (HDFS.dll)
@@ -19,7 +22,6 @@
 *)
 
 (** Generation of VHDL netlists *)
-module DigitalLogic.Vhdl
 
 open DigitalLogic.Numeric.Conversions
 open DigitalLogic.Circuit

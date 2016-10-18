@@ -1,3 +1,6 @@
+module DigitalLogic.C
+
+#nowarn "62"    // Using ^ for string concatenation
 #light "off"
 (*
   HDFS Digital Logic Hardware Design (HDFS.dll)
@@ -20,7 +23,6 @@
 
 (** C, C++, C# and Simulink simulation model generator *)
 (* Thanks to John White for providing the simulink model generator *)
-module DigitalLogic.C
 
 open DigitalLogic
 open Numeric.Ops
