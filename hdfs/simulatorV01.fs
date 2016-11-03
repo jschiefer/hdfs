@@ -21,6 +21,7 @@
 (** HDFS release 0.1 version of the simulator.  *)
 module DigitalLogic.SimulatorV01
 
+open System
 open System.Diagnostics;
 open DigitalLogic.Circuit
 open DigitalLogic.Signal
@@ -94,7 +95,7 @@ let int_of_hex h =
   | 'c'  -> 12 | 'd' -> 13 | 'e'  -> 14 | 'f' -> 15
   | 'A'  -> 10 | 'B' -> 11 | 'C'  -> 12 | 'D' -> 13 
   | 'E'  -> 14 | 'F' -> 15
-  | _ -> failwith ("int_of_hex: Invalid hex char: " ^ (String.of_char h))
+  | _ -> failwith ("int_of_hex: Invalid hex char: " ^ (string h))
   
 (** Integer simulator datatype implementation *)
 let simDataInt = 
@@ -136,13 +137,13 @@ let simDataInt =
         | B_eq -> if !a = !b then 1 else 0
         | B_lt -> if !a < !b then 1 else 0
         | B_cat -> !b ||| (!a <<< wb)); 
-    sel = (fun r a hi lo -> r :=  UInt32.to_int ((UInt32.of_int !a) >>> lo)); 
+    sel = (fun r a hi lo -> r :=  int ((uint32 !a) >>> lo)); 
     eq = (fun a b w -> !a = !b);
     to_hex_str = (fun d bits -> 
         let b4 = (bits + 3) / 4 in
         let rec build v b =
           if b4 = b then ""
-          else (build (UInt32.to_int ((UInt32.of_int v) >>> 4)) (b+1)) ^ (hex_of_int (v &&& 15)) in
+          else (build (int ((uint32 v) >>> 4)) (b+1)) ^ (hex_of_int (v &&& 15)) in
         build !d 0
       );
     of_hex_str = (fun d str w -> 
@@ -181,7 +182,7 @@ let simDataUInt32 =
       for i = 0 to String.length s - 1 do
         data := (!data <<< 1) + (if s.[i] = '1' then 1ul else 0ul)
       done);
-    to_int = (fun a -> UInt32.to_int !a);
+    to_int = (fun a -> int !a);
     copy = (fun a b w -> a := !b);
     mask = (fun a w -> if w < 32 then a := !a &&& (~~~ (mask <<< w)));
     sign_extend = (fun a w -> a := sign_extend !a w);
@@ -206,7 +207,7 @@ let simDataUInt32 =
         let b4 = (bits + 3) / 4 in
         let rec build v b =
           if b4 = b then ""
-          else (build (v >>> 4) (b+1)) ^ (hex_of_int (UInt32.to_int (v &&& 15ul))) in
+          else (build (v >>> 4) (b+1)) ^ (hex_of_int (int (v &&& 15ul))) in
         build !d 0
       );
     of_hex_str = (fun d str w -> 
@@ -215,7 +216,7 @@ let simDataUInt32 =
         let width = (w+3)/4 in
         d := 0ul;
         for i=0 to width-1 do
-          d := !d ||| (UInt32.of_int ((int_of_hex str.[idx i]) <<< (4*i)));
+          d := !d ||| (uint32 ((int_of_hex str.[idx i]) <<< (4*i)));
         done;
       );
     to_bin_str = (fun d bits ->
@@ -245,7 +246,7 @@ let simDataUInt64 =
       for i = 0 to String.length s - 1 do
         data := (!data <<< 1) + (if s.[i] = '1' then 1UL else 0UL)
       done);
-    to_int = (fun a -> UInt64.to_int !a);
+    to_int = (fun a -> int !a);
     copy = (fun a b w -> a := !b);
     sign_extend = (fun a w -> a := sign_extend !a w);
     mask = (fun a w -> if w < 64 then a := !a &&& (~~~ (mask <<< w)));
@@ -270,7 +271,7 @@ let simDataUInt64 =
         let b4 = (bits + 3) / 4 in
         let rec build v b =
           if b4 = b then ""
-          else (build (v >>> 4) (b+1)) ^ (hex_of_int (UInt64.to_int (v &&& 15UL))) in
+          else (build (v >>> 4) (b+1)) ^ (hex_of_int (int (v &&& 15UL))) in
         build !d 0
       );
     of_hex_str = (fun d str w -> 
@@ -279,7 +280,7 @@ let simDataUInt64 =
         let width = (w+3)/4 in
         d := 0UL;
         for i=0 to width-1 do
-          d := !d ||| (UInt64.of_int ((int_of_hex str.[idx i]) <<< (4*i)));
+          d := !d ||| (uint64 ((int_of_hex str.[idx i]) <<< (4*i)));
         done;
       );
     to_bin_str = (fun d bits ->
@@ -292,11 +293,11 @@ let simDataUInt64 =
   }
 
 /// r = a * b.  a and b must be sign extended (if appropriate) to 32 bits prior to this call
-let array_mul words_r sign_a sign_b words_a words_b r a b = 
+let array_mul words_r sign_a sign_b words_a words_b (r:uint32[]) (a:uint32[]) (b:uint32[]) = 
   if words_r = 1 then (
     r.[0] <- a.[0] * b.[0]
   ) else (
-    let access a words sign i =
+    let access (a:uint32[]) words sign i =
       if i >= words then (if sign then 0xFFFFFFFFul else 0ul)
       else a.[i] in
     let access_a = access a words_a sign_a in
@@ -306,10 +307,10 @@ let array_mul words_r sign_a sign_b words_a words_b r a b =
     for i = 0 to words_r - 1 do 
       let ib = ref 0 in
       for ia = i downto 0 do 
-        let tmp = ref ((UInt32.to_uint64 (access_a ia)) * (UInt32.to_uint64 (access_b !ib))) in
+        let tmp = ref ((uint64 (access_a ia)) * (uint64 (access_b !ib))) in
         for ic = i to words_r - 1 do
-          tmp := !tmp + (UInt32.to_uint64 r.[ic]);
-          r.[ic] <- UInt64.to_uint32 (!tmp &&& mask);
+          tmp := !tmp + (uint64 r.[ic]);
+          r.[ic] <- uint32 (!tmp &&& mask);
           tmp := !tmp >>> 32;
         done;
         ib := !ib + 1;
@@ -320,7 +321,7 @@ let array_mul words_r sign_a sign_b words_a words_b r a b =
 (** Array based simulator datatype implementation *)
 let simDataArray = 
   let mask = ~~~ 0ul in
-  let sign_bit a w = (* gets the sign bit *)
+  let sign_bit (a:uint32[]) w = (* gets the sign bit *)
     let w = w - 1 in
     let word = w / 32 in
     let bit = w % 32 in
@@ -336,7 +337,7 @@ let simDataArray =
     );
     sb
   in
-  let mask_data a w = (* masks the top word *)
+  let mask_data (a:uint32[]) w = (* masks the top word *)
     let words = (w + 31) / 32 in
     let bits = w % 32 in
     if bits <> 0 then
@@ -361,7 +362,7 @@ let simDataArray =
           data.[word] <- data.[word] ||| (1ul <<< bit);
       done);
       
-    to_int = (fun a -> UInt32.to_int a.[0]);
+    to_int = (fun a -> int a.[0]);
     copy = (fun a b w -> 
       let words = (w + 31) / 32 in
       for i = 0 to words - 1 do a.[i] <- b.[i] done);
@@ -379,16 +380,16 @@ let simDataArray =
         let tmp = ref 0UL in
         let mask = 0xFFFFFFFFUL in
         for i=0 to words_a - 1 do
-          tmp := (UInt32.to_uint64 a.[i]) + (UInt32.to_uint64 b.[i]) + !tmp;
-          r.[i] <- UInt64.to_uint32 (!tmp &&& mask);
+          tmp := (uint64 a.[i]) + (uint64 b.[i]) + !tmp;
+          r.[i] <- uint32 (!tmp &&& mask);
           tmp := (!tmp >>> 32) &&& 1UL;
         done;
       | B_sub -> 
         let tmp = ref 0UL in
         let mask = 0xFFFFFFFFUL in
         for i=0 to words_a - 1 do
-          tmp := (UInt32.to_uint64 a.[i]) - (UInt32.to_uint64 b.[i]) - !tmp;
-          r.[i] <- UInt64.to_uint32 (!tmp &&& mask);
+          tmp := (uint64 a.[i]) - (uint64 b.[i]) - !tmp;
+          r.[i] <- uint32 (!tmp &&& mask);
           tmp := (!tmp >>> 32) &&& 1UL;
         done;
       (* multiplication *)
@@ -485,7 +486,7 @@ let simDataArray =
         let b4 = (bits + 3) / 4 in
         let rec build b =
           if b4 = b then ""
-          else (build (b+1)) ^ (hex_of_int (UInt32.to_int ((d.[b/8] >>> (4*(b%8))) &&& 15ul))) in
+          else (build (b+1)) ^ (hex_of_int (int ((d.[b/8] >>> (4*(b%8))) &&& 15ul))) in
         build 0
       );
     of_hex_str = (fun d str w -> 
@@ -497,7 +498,7 @@ let simDataArray =
           let nibs = min 8 (width - (i*8)) in
           d.[i] <- 0ul;
           for j=0 to nibs-1 do
-            d.[i] <- d.[i] ||| (UInt32.of_int ((int_of_hex str.[idx ((i*8)+j)]) <<< (4*j)));
+            d.[i] <- d.[i] ||| (uint32 ((int_of_hex str.[idx ((i*8)+j)]) <<< (4*j)));
           done;
         done
       );
@@ -519,7 +520,7 @@ let simDataArray =
 (** Create a simulator from the given circuit.  Performs the scheduling and "compiles" a task list. *)
 let create (d : 'a sim_data_t) (circuit : Circuit) = 
 
-  let os = output_string stdout in
+  let os = printfn "%s" in
   
   let inputs = circuit.Inputs in
   let outputs = circuit.Outputs in
@@ -600,8 +601,8 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
       failwith "Tristates not supported in simulation"
   in
 
-  let data_map = List.fold_left make_data_map Map.empty (inputs @ outputs @ wires @ regs @ mems @ logic) in
-  let seq_data_map = List.fold_left make_data_map Map.empty regs in
+  let data_map = List.fold make_data_map Map.empty (inputs @ outputs @ wires @ regs @ mems @ logic) in
+  let seq_data_map = List.fold make_data_map Map.empty regs in
   
   let find (signal : Signal) = Map.find signal.uid data_map in
   let find_seq (signal : Signal) = Map.find signal.uid seq_data_map in
@@ -615,7 +616,7 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
      The functions when executed return an indication of whether the code was executed *)
   let rec behave_tasks tgt_data code = 
     let code = List.map (behave_task tgt_data) code in
-    (fun () -> List.fold_left (fun b x -> x() || b) false code) 
+    (fun () -> List.fold (fun b x -> x() || b) false code) 
   and behave_task tgt_data code = 
     match code with
     | B_if(cond, on_true, on_false) -> (
@@ -631,7 +632,7 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
       let width_of_cond = width cond in
       let data_of_cond = find cond in
       (* map of case index constants to the tasks to execute. *)
-      let case_tasks_map = List.fold_left (fun map (cond_match, exprs) -> 
+      let case_tasks_map = List.fold (fun map (cond_match, exprs) -> 
         let data_of_cond_match = d.create (width cond_match) in
         d.set_const data_of_cond_match (string_of_const cond_match);
         let code_of_case = behave_tasks tgt_data exprs in
@@ -681,7 +682,7 @@ let create (d : 'a sim_data_t) (circuit : Circuit) =
       let data = find signal in
       let sel = find sel in
       let opts = List.mapi (fun i x -> i, find x) dlist in
-      let opts_map = List.fold_left (fun map (i,x) -> Map.add i x map) Map.empty opts in
+      let opts_map = List.fold (fun map (i,x) -> Map.add i x map) Map.empty opts in
       (fun () -> 
         let idx = (min (d.to_int sel) (len-1)) in
         let dmux = (Map.find idx opts_map) in
@@ -1000,7 +1001,7 @@ let execute_command' show_output exe_name args =
   let _ = p.Start() in
   let output = p.StandardOutput.ReadToEnd() in
   p.WaitForExit(); 
-  if show_output then output_string stdout output
+  if show_output then printfn "%s" output
   else ()
 
 (** run an external (shell) and wait for it to complete.  Dont display its stdout. *)
