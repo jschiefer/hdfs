@@ -1,4 +1,4 @@
-namespace DigitalLogi.Vhdlc
+namespace DigitalLogic
 
 #nowarn "62"    // Using ^ for string concatenation
 #light "off"
@@ -27,6 +27,8 @@ open DigitalLogic.Numeric.Conversions
 open DigitalLogic.Circuit
 open DigitalLogic.Signal
 
+module Vhdl = 
+begin
 (** Given an output channel, circuit name and circuit datatype writes a VHDL netlist *)
 let write (f:System.IO.TextWriter) name (circuit : Circuit) = 
   let t0 = System.DateTime.Now in
@@ -460,3 +462,4 @@ port (
   
   timing "Wrote vhdl in" t0 System.DateTime.Now
 
+  end

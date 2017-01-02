@@ -870,17 +870,17 @@ let generator dcfg sim cycles =
     (fun () -> 
       clock_cycle := 0;
       sim_reset sim;
-      List.iter (fun ((n,w,d),x) -> for i=0 to cycles-1 do dcfg.set_zero x.[i] w done) inputs_d;
-      List.iter (fun ((n,w,d),x) -> for i=0 to cycles-1 do dcfg.set_zero x.[i] w done) named_wires_d;
-      List.iter (fun ((n,w,d),x) -> for i=0 to cycles-1 do dcfg.set_zero x.[i] w done) outputs_d;
+      List.iter (fun ((n,w,d),(x:'a[])) -> for i=0 to cycles-1 do dcfg.set_zero x.[i] w done) inputs_d;
+      List.iter (fun ((n,w,d),(x:'a[])) -> for i=0 to cycles-1 do dcfg.set_zero x.[i] w done) named_wires_d;
+      List.iter (fun ((n,w,d),(x:'a[])) -> for i=0 to cycles-1 do dcfg.set_zero x.[i] w done) outputs_d;
     ),
     (fun () -> 
       if !clock_cycle >= cycles then failwith "Exceeded maximum simulation length";
       sim_cycle sim;
       (* record inputs after the cycle as they may have been (properly) truncated *)
-      List.iter (fun ((n,w,d),a) -> dcfg.copy a.[!clock_cycle] d w) inputs_d;
-      List.iter (fun ((n,w,d),a) -> dcfg.copy a.[!clock_cycle] d w) named_wires_d;
-      List.iter (fun ((n,w,d),a) -> dcfg.copy a.[!clock_cycle] d w) outputs_d;
+      List.iter (fun ((n,w,d),(a:'a[])) -> dcfg.copy a.[!clock_cycle] d w) inputs_d;
+      List.iter (fun ((n,w,d),(a:'a[])) -> dcfg.copy a.[!clock_cycle] d w) named_wires_d;
+      List.iter (fun ((n,w,d),(a:'a[])) -> dcfg.copy a.[!clock_cycle] d w) outputs_d;
       clock_cycle := !clock_cycle + 1; 
     ),
     sim_inputs sim, sim_named_wires sim, sim_outputs sim
